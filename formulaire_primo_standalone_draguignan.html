@@ -272,7 +272,7 @@
                 <div class="filters-section">
                     <div class="filters-left">
                         <fieldset class="search-criteria">
-                            <legend>Filtres de recherche</legend>
+                            <legend>Formulaire de recherche</legend>
                             <div id="searchRows"></div>
                             <div class="button-row">
                                 <button type="button" class="btn-add" id="addRowBtn">
@@ -292,50 +292,53 @@
                     </div>
 
                     <div class="filters-right">
+                        <fieldset class="search-filters">
+                        <legend>Filtres</legend>
                         <div class="filter-group">
-                            <label for="support">Support</label>
-                            <select id="support" name="support" required>
-                                <option value="physical" selected>Physique</option>
-                                <option value="online">En ligne</option>
-                            </select>
-                        </div>
+                                <label for="support">Support</label>
+                                <select id="support" name="support" required>
+                                    <option value="physical" selected>Physique</option>
+                                    <option value="online">En ligne</option>
+                                </select>
+                            </div>
 
-                        <div class="filter-group">
-                            <label for="materialType">Type de document</label>
-                            <select id="materialType" name="materialType">
-                                <option value="all_items" selected>Tous types</option>
-                                <option value="books">Livres</option>
-                                <option value="journals">Revues</option>
-                                <option value="videos">Vidéos</option>
-                                <option value="articles">Articles (en ligne uniquement)</option>
-                            </select>
-                        </div>
+                            <div class="filter-group">
+                                <label for="materialType">Type de document</label>
+                                <select id="materialType" name="materialType">
+                                    <option value="all_items" selected>Tous types</option>
+                                    <option value="books">Livres</option>
+                                    <option value="journals">Revues</option>
+                                    <option value="videos">Vidéos</option>
+                                    <option value="articles">Articles (en ligne uniquement)</option>
+                                </select>
+                            </div>
 
-                        <div class="filter-group">
-                            <label for="language">Langue</label>
-                            <select id="language" name="language">
-                                <option value="all_items" selected>Toutes langues</option>
-                                <option value="eng">Anglais</option>
-                                <option value="fre">Français</option>
-                                <option value="ger">Allemand</option>
-                                <option value="spa">Espagnol</option>
-                                <option value="ita">Italien</option>
-                            </select>
-                        </div>
+                            <div class="filter-group">
+                                <label for="language">Langue</label>
+                                <select id="language" name="language">
+                                    <option value="all_items" selected>Toutes langues</option>
+                                    <option value="eng">Anglais</option>
+                                    <option value="fre">Français</option>
+                                    <option value="ger">Allemand</option>
+                                    <option value="spa">Espagnol</option>
+                                    <option value="ita">Italien</option>
+                                </select>
+                            </div>
 
-                        <div class="filter-group">
-                            <label for="publicationDate">Date de publication</label>
-                            <select id="publicationDate" name="publicationDate">
-                                <option value="all_items" selected>Toutes les années</option>
-                                <option value="1-YEAR">365 derniers jours</option>
-                                <option value="2-YEAR">2 dernières années</option>
-                                <option value="5-YEAR">5 dernières années</option>
-                                <option value="10-YEAR">10 dernières années</option>
-                                <option value="20-YEAR">20 dernières années</option>
-                            </select>
+                            <div class="filter-group">
+                                <label for="publicationDate">Date de publication</label>
+                                <select id="publicationDate" name="publicationDate">
+                                    <option value="all_items" selected>Toutes les années</option>
+                                    <option value="1-YEAR">365 derniers jours</option>
+                                    <option value="2-YEAR">2 dernières années</option>
+                                    <option value="5-YEAR">5 dernières années</option>
+                                    <option value="10-YEAR">10 dernières années</option>
+                                    <option value="20-YEAR">20 dernières années</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </fieldset>
 
                 <div class="divider"></div>
 
