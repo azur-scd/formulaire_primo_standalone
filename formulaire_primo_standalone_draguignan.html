@@ -237,28 +237,26 @@
             height: 20px;
             fill: currentColor;
         }
+		
+		@media (max-width: 768px) {
+			.search-row {
+				flex-wrap: wrap;
+				gap: 8px;
+			}
 
-        @media (max-width: 768px) {
-            .search-row {
-                flex-direction: column;
-            }
+			.input-group.query {
+				flex-basis: 100%;
+			}
 
-            .input-group.bool,
-            .input-group.category,
-            .input-group.operator,
-            .input-group.query {
-                flex: 1 1 auto;
-                width: 100%;
-            }
+			.filters-section {
+				flex-direction: column;
+			}
 
-            .filters-section {
-                flex-direction: column;
-            }
+			.filters-right {
+				width: 100%;
+			}
+		}
 
-            .filters-right {
-                width: 100%;
-            }
-        }
     </style>
 </head>
 <body>
