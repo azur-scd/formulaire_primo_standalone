@@ -45,7 +45,7 @@
     <title>Formulaire Primo déporté ciblant Draguignan, pour intégration au site DiBSO</title>
     <style>
 
-        #PrimoAdvancedSearchForm {
+        #primo-standalone-form {
             max-width: 1200px;
             margin: 0 auto;
             background: white;
@@ -53,46 +53,46 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .search-criteria {
+        .primo-search-criteria {
             margin-bottom: 24px;
         }
 
-        .search-criteria legend {
+        .primo-search-criteria legend {
             font-size: 16px;
             font-weight: 500;
             margin-bottom: 16px;
             color: #333;
         }
 
-        .search-row {
+        .primo-search-row {
             display: flex;
             gap: 12px;
             margin-bottom: 12px;
             align-items: flex-start;
         }
 
-        .input-group {
+        .primo-input-group {
             display: flex;
             flex-direction: column;
         }
 
-        .input-group.bool {
+        .primo-input-group.bool {
             flex: 0 0 80px;
         }
 
-        .input-group.spacer {
+        .primo-input-group.spacer {
             flex: 0 0 80px;
         }
 
-        .input-group.category {
+        .primo-input-group.category {
             flex: 0 0 200px;
         }
 
-        .input-group.operator {
+        .primo-input-group.operator {
             flex: 0 0 150px;
         }
 
-        .input-group.query {
+        .primo-input-group.query {
             flex: 1;
         }
 
@@ -121,7 +121,7 @@
             text-transform: uppercase;
         }
 
-        .button-row {
+        .primo-button-row {
             display: flex;
             gap: 12px;
             margin-top: 16px;
@@ -140,25 +140,25 @@
             transition: background-color 0.3s;
         }
 
-        .btn-add {
+        .primo-btn-add {
             background-color: transparent;
             color: #1565c0;
         }
 
-        .btn-add:hover {
+        .primo-btn-add:hover {
             background-color: #f0f0f0;
         }
 
-        .btn-clear {
+        .primo-btn-clear {
             background-color: transparent;
             color: #666;
         }
 
-        .btn-clear:hover {
+        .primo-btn-clear:hover {
             background-color: #f0f0f0;
         }
 
-        .btn-search {
+        .primo-btn-search {
             background-color: #1565c0;
             color: white;
             font-weight: 500;
@@ -166,69 +166,69 @@
             font-size: 15px;
         }
 
-        .btn-search:hover {
+        .primo-btn-search:hover {
             background-color: #0d47a1;
         }
 
-        .filters-section {
+        .primo-filters-section {
             display: flex;
             gap: 24px;
             margin-top: 24px;
         }
 
-        .filters-left {
+        .primo-filters-left {
             flex: 1;
         }
 
-        .filters-right {
+        .primo-filters-right {
             width: 300px;
         }
 
-        .filter-group {
+        .primo-filter-group {
             margin-bottom: 20px;
         }
 
-        .filter-group label {
+        .primo-filter-group label {
             display: block;
             font-size: 12px;
             color: #666;
             margin-bottom: 4px;
         }
 
-        .divider {
+        .primo-divider {
             height: 1px;
             background-color: #e0e0e0;
             margin: 20px 0;
         }
 
-        .search-output {
+        .primo-search-output {
             margin-top: 24px;
             padding: 16px;
             background-color: #f9f9f9;
             border-radius: 4px;
         }
 
-        .icon {
+        .primo-icon {
             width: 20px;
             height: 20px;
             fill: currentColor;
         }
         
         @media (max-width: 768px) {
-            .search-row {
+            .primo-search-row {
                 flex-wrap: wrap;
                 gap: 8px;
             }
 
-            .input-group.query {
+            .primo-input-group.query {
                 flex-basis: 100%;
             }
 
-            .filters-section {
+            .primo-filters-section {
                 flex-direction: column;
             }
 
-            .filters-right {
+            .primo-filters-right {
                 width: 100%;
             }
         }
@@ -236,21 +236,21 @@
     </style>
 </head>
 <body>
-    <form id="PrimoAdvancedSearchForm">
-        <div class="filters-section">
-            <div class="filters-left">
-                <fieldset class="search-criteria">
+    <form id="primo-standalone-form">
+        <div class="primo-filters-section">
+            <div class="primo-filters-left">
+                <fieldset class="primo-search-criteria">
                     <legend>Titre, auteur, éditeur, sujet...</legend>
                     <div id="searchRows"></div>
-                    <div class="button-row">
-                        <button type="button" class="btn-add" id="addRowBtn">
-                            <svg class="icon" viewBox="0 0 24 24">
+                    <div class="primo-button-row">
+                        <button type="button" class="primo-btn-add" id="addRowBtn">
+                            <svg class="primo-icon" viewBox="0 0 24 24">
                                 <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
                             </svg>
                             Ajouter une nouvelle ligne
                         </button>
-                        <button type="button" class="btn-clear" id="clearBtn">
-                            <svg class="icon" viewBox="0 0 24 24">
+                        <button type="button" class="primo-btn-clear" id="clearBtn">
+                            <svg class="primo-icon" viewBox="0 0 24 24">
                                 <path d="M12,5V1L7,6L12,11V7A6,6 0 0,1 18,13A6,6 0 0,1 12,19A6,6 0 0,1 6,13H4A8,8 0 0,0 12,21A8,8 0 0,0 20,13A8,8 0 0,0 12,5Z"/>
                             </svg>
                             Effacer
@@ -259,10 +259,10 @@
                 </fieldset>
             </div>
 
-            <div class="filters-right">
+            <div class="primo-filters-right">
                 <fieldset class="search-filters">
                 <legend>Filtres</legend>
-                <div class="filter-group">
+                <div class="primo-filter-group">
                         <label for="support">Support</label>
                         <select id="support" name="support" required>
                             <option value="physical" selected>Physique</option>
@@ -270,7 +270,7 @@
                         </select>
                     </div>
 
-                    <div class="filter-group">
+                    <div class="primo-filter-group">
                         <label for="materialType">Type de document</label>
                         <select id="materialType" name="materialType">
                             <option value="all_items" selected>Tous types</option>
@@ -283,7 +283,7 @@
                         </select>
                     </div>
 
-                    <div class="filter-group">
+                    <div class="primo-filter-group">
                         <label for="language">Langue</label>
                         <select id="language" name="language">
                             <option value="all_items" selected>Toutes langues</option>
@@ -295,7 +295,7 @@
                         </select>
                     </div>
 
-                    <div class="filter-group">
+                    <div class="primo-filter-group">
                         <label for="publicationDate">Date de publication</label>
                         <select id="publicationDate" name="publicationDate">
                             <option value="all_items" selected>Toutes les années</option>
@@ -309,11 +309,11 @@
             </div>
         </fieldset>
 
-        <div class="divider"></div>
+        <div class="primo-divider"></div>
 
-        <div class="search-output">
-            <button type="submit" class="btn-search">
-                <svg class="icon" viewBox="0 0 24 24">
+        <div class="primo-search-output">
+            <button type="submit" class="primo-btn-search">
+                <svg class="primo-icon" viewBox="0 0 24 24">
                     <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/>
                 </svg>
                 Rechercher
@@ -437,20 +437,20 @@
 
             searchRows.forEach((row, index) => {
                 const rowDiv = document.createElement('div');
-                rowDiv.className = 'search-row';
+                rowDiv.className = 'primo-search-row';
 
                 if (index === 0) {
                     // La première ligne n'a pas d'opérateur booléen affiché.
                     // On place donc un simple espace vide de même largeur
                     // pour conserver l'alignement visuel avec les lignes suivantes.
                     const spacerGroup = document.createElement('div');
-                    spacerGroup.className = 'input-group spacer';
+                    spacerGroup.className = 'primo-input-group spacer';
                     rowDiv.appendChild(spacerGroup);
                 } else {
                     // À partir de la deuxième ligne, on affiche le sélecteur booléen
                     // qui permet de relier cette ligne à la précédente.
                     const boolGroup = document.createElement('div');
-                    boolGroup.className = 'input-group bool';
+                    boolGroup.className = 'primo-input-group bool';
                     const boolSelect = document.createElement('select');
                     boolSelect.className = 'bool-operator';
                     boolOperators.forEach(op => {
@@ -472,7 +472,7 @@
 
                 // Sélecteur du champ interrogé (titre, auteur, sujet, etc.).
                 const categoryGroup = document.createElement('div');
-                categoryGroup.className = 'input-group category';
+                categoryGroup.className = 'primo-input-group category';
                 const categorySelect = document.createElement('select');
                 categories.forEach(cat => {
                     const option = document.createElement('option');
@@ -490,7 +490,7 @@
                 // Sélecteur du type de correspondance textuelle.
                 // Exemple : contient / exact / commence par.
                 const operatorGroup = document.createElement('div');
-                operatorGroup.className = 'input-group operator';
+                operatorGroup.className = 'primo-input-group operator';
                 const operatorSelect = document.createElement('select');
                 operators.forEach(op => {
                     const option = document.createElement('option');
@@ -509,7 +509,7 @@
                 // À chaque frappe, on synchronise l'objet correspondant
                 // dans le tableau searchRows.
                 const queryGroup = document.createElement('div');
-                queryGroup.className = 'input-group query';
+                queryGroup.className = 'primo-input-group query';
                 const queryInput = document.createElement('input');
                 queryInput.type = 'text';
                 queryInput.placeholder = 'Saisir un terme de recherche';
@@ -567,7 +567,7 @@
         // Gestion de la soumission du formulaire.
         // Au lieu d'envoyer un formulaire HTML classique,
         // on empêche l'envoi natif pour construire manuellement l'URL Primo.
-        document.getElementById('PrimoAdvancedSearchForm').addEventListener('submit', (e) => {
+        document.getElementById('primo-standalone-form').addEventListener('submit', (e) => {
             e.preventDefault();
 
             // Vérification minimale : il faut au moins un terme saisi
