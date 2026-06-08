@@ -1,5 +1,44 @@
 <!DOCTYPE html>
 <html lang="fr">
+
+<!-- Formulaire de recherche avancée déporté pour Primo BO adapté aux spécificités UniCA -->
+<!-- Ciblé sur la BU Draguignan -->
+<!-- Génération dynamique de 2 à 7 lignes de recherche. -->
+<!-- Champs disponibles : -->
+<!-- Tous les champs -->
+<!-- Titre -->
+<!-- Auteur/créateur -->
+<!-- Sujet -->
+<!-- Éditeur (lsr01) -->
+<!-- Collection (lsr02) -->
+<!-- ISBN/ISSN/EAN/PPN/NNT/DOI (lsr03) -->
+<!-- Date de publication (cdate) -->
+<!-- Cote et code-barre (lsr07) -->
+<!-- Opérateurs : -->
+<!-- contient -->
+<!-- est égal à -->
+<!-- commence par -->
+<!-- Opérateurs booléens : -->
+<!-- ET (AND) -->
+<!-- OU (OR) -->
+<!-- SAUF (NOT) -->
+<!-- Filtres latéraux : -->
+<!-- Support (Physique / En ligne) -->
+<!-- Type de document -->
+<!-- Langue -->
+<!-- Date de publication -->
+<!-- Pour le support : -->
+<!-- Physique ⇒ facet=library,include,DRAGUIGNAN -->
+<!-- En ligne ⇒ facet=tlevel,include,online_resources -->
+<!-- Paramètres Primo par défaut : -->
+<!-- tab=default_tab -->
+<!-- search_scope=all -->
+<!-- vid=UCA -->
+<!-- lang=fr_FR -->
+<!-- mode=advanced -->
+<!-- offset=0 -->
+<!-- La recherche ouvre le résultat dans un nouvel onglet (window.open(..., '_blank')). -->
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -468,6 +507,11 @@
 
         document.getElementById('advancedSearchForm').addEventListener('submit', (e) => {
             e.preventDefault();
+            const hasQuery = searchRows.some(row => row.query.trim() !== '');
+            if (!hasQuery) {
+                alert('Veuillez saisir au moins un terme de recherche.');
+                return;
+            }
 
             const url = new URL(baseUrl);
             
