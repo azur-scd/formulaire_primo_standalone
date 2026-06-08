@@ -50,7 +50,7 @@
             padding: 0;
         }
 
-        .advancedSearchForm {
+        #PrimoAdvancedSearchForm {
             max-width: 1200px;
             margin: 0 auto;
             background: white;
@@ -250,7 +250,7 @@
     </style>
 </head>
 <body>
-    <form id="advancedSearchForm">
+    <form id="PrimoAdvancedSearchForm">
         <div class="filters-section">
             <div class="filters-left">
                 <fieldset class="search-criteria">
@@ -518,7 +518,7 @@
             document.getElementById('publicationDate').value = 'all_items';
         });
 
-        document.getElementById('advancedSearchForm').addEventListener('submit', (e) => {
+        document.getElementById('PrimoAdvancedSearchForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const hasQuery = searchRows.some(row => row.query.trim() !== '');
             if (!hasQuery) {
