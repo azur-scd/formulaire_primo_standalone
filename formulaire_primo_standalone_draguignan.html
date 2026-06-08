@@ -325,11 +325,10 @@
                                 <label for="publicationDate">Date de publication</label>
                                 <select id="publicationDate" name="publicationDate">
                                     <option value="all_items" selected>Toutes les années</option>
-                                    <option value="1-YEAR">année dernière + année en cours</option>
-                                    <option value="2-YEAR">2 dernières années + année en cours</option>
-                                    <option value="5-YEAR">5 dernières années + année en cours</option>
-                                    <option value="10-YEAR">10 dernières années + année en cours</option>
-                                    <option value="20-YEAR">20 dernières années + année en cours</option>
+                                    <option value="current_year">Année en cours</option>
+                                    <option value="previous_year">Année dernière + année en cours</option>
+                                    <option value="last_5_years">5 dernières années</option>
+                                    <option value="last_10_years">10 dernières années</option>
                                 </select>
                             </div>
                         </div>
@@ -580,8 +579,43 @@
 
             const pubDate = document.getElementById('publicationDate').value;
             if (pubDate !== 'all_items') {
-                url.searchParams.append('pfilter', `creationdate,exact,${pubDate},AND`);
+            // on utilise facet et non pfilter prévu dans le formulaire avancé par défaut pour rendre la facette visible dans la page de résultats
+                const currentYear = new Date().getFullYear();
+                let startYear;
+                let endYear;
+
+                switch (pubDate) {
+                    case 'current_year':
+                        startYear = currentYear;
+                        endYear = currentYear;
+                        break;
+
+                    case 'previous_year':
+                        startYear = currentYear - 1;
+                        endYear = currentYear - 1;
+                        break;
+
+                    case 'last_5_years':
+                        startYear = currentYear - 5;
+                        endYear = currentYear;
+                        break;
+
+                    case 'last_10_years':
+                        startYear = currentYear - 10;
+                        endYear = currentYear;
+                        break;
+                }
+
+                url.searchParams.append(
+                    'facet',
+                    `searchcreationdate,include,${startYear}|,|${endYear}`
+                );
             }
+
+
+            
+            
+    
 
             Object.entries(defaultParams).forEach(([key, value]) => {
                 url.searchParams.append(key, value);
