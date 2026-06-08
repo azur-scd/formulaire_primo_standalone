@@ -654,12 +654,8 @@
                         break;
 
                     case 'previous_year':
-                        // NB : le libellé HTML indique actuellement
-                        // "Année dernière + année en cours",
-                        // mais le code ici cible uniquement l'année précédente.
-                        // Si besoin, il faudrait mettre endYear = currentYear.
                         startYear = currentYear - 1;
-                        endYear = currentYear - 1;
+                        endYear = currentYear;
                         break;
 
                     case 'last_5_years':
