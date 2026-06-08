@@ -307,7 +307,7 @@
                                 <option value="books">Livres</option>
                                 <option value="journals">Revues</option>
                                 <option value="videos">Vidéos</option>
-                                <option value="articles">Articles</option>
+                                <option value="articles">Articles (en ligne uniquement)</option>
                             </select>
                         </div>
 
@@ -387,6 +387,22 @@
         ];
 
         let searchRows = [];
+
+        function updateMaterialTypes() {
+            const support = document.getElementById('support').value;
+            const materialType = document.getElementById('materialType');
+            const articleOption = materialType.querySelector('option[value="articles"]');
+
+            if (support === 'physical') {
+                articleOption.disabled = true;
+
+                if (materialType.value === 'articles') {
+                    materialType.value = 'all_items';
+                }
+            } else {
+                articleOption.disabled = false;
+            }
+        }
 
         function createSearchRow(index) {
             return {
@@ -553,7 +569,11 @@
             window.open(url.toString(), '_blank');
         });
 
+        document.getElementById('support').addEventListener('change', updateMaterialTypes);
+
         initializeForm();
+        updateMaterialTypes();
+
     </script>
 </body>
 </html>
