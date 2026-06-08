@@ -549,8 +549,7 @@
             const materialType = document.getElementById('materialType').value;
             if (materialType !== 'all_items') {
             // on utilise mfacet et non pfilter prévu dans le formulaire avancé par défaut pour rendre la facette visible dans la page de résultats
-            // mfacet=rtype,include,articles,1&mfacet=rtype,include,magazinearticle,1
-            // règle spécifique pour les articles
+            // règle spécifique pour les articles : recherche multiple de 2 types de documents (articles et magazinearticle)
                 if (materialType === 'articles') {
                     url.searchParams.append('mfacet', 'rtype,include,articles,1')
                     url.searchParams.append('mfacet', 'rtype,include,magazinearticle,1')
