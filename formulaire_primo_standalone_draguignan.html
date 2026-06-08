@@ -550,12 +550,14 @@
 
             const materialType = document.getElementById('materialType').value;
             if (materialType !== 'all_items') {
-                url.searchParams.append('pfilter', `pfilter,exact,${materialType},AND`);
+            // on utilise facet et non pfilter prévu dans le formulaire avancé par défaut pour rendre la facette visible dans la page de résultats
+                url.searchParams.append('facet', `rtype,include,${materialType}`);
             }
 
             const language = document.getElementById('language').value;
             if (language !== 'all_items') {
-                url.searchParams.append('pfilter', `lang,exact,${language},AND`);
+            // on utilise facet et non pfilter prévu dans le formulaire avancé par défaut pour rendre la facette visible dans la page de résultats
+                url.searchParams.append('facet', `lang,include,${language}`);
             }
 
             const pubDate = document.getElementById('publicationDate').value;
