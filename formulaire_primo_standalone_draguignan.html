@@ -53,50 +53,50 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .primo-search-criteria {
+        #primo-standalone-form .primo-search-criteria {
             margin-bottom: 24px;
         }
 
-        .primo-search-criteria legend {
+        #primo-standalone-form .primo-search-criteria legend {
             font-size: 16px;
             font-weight: 500;
             margin-bottom: 16px;
             color: #333;
         }
 
-        .primo-search-row {
+        #primo-standalone-form .primo-search-row {
             display: flex;
             gap: 12px;
             margin-bottom: 12px;
             align-items: flex-start;
         }
 
-        .primo-input-group {
+        #primo-standalone-form .primo-input-group {
             display: flex;
             flex-direction: column;
         }
 
-        .primo-input-group.bool {
+        #primo-standalone-form .primo-input-group.bool {
             flex: 0 0 80px;
         }
 
-        .primo-input-group.spacer {
+        #primo-standalone-form .primo-input-group.spacer {
             flex: 0 0 80px;
         }
 
-        .primo-input-group.category {
+        #primo-standalone-form .primo-input-group.category {
             flex: 0 0 200px;
         }
 
-        .primo-input-group.operator {
+        #primo-standalone-form .primo-input-group.operator {
             flex: 0 0 150px;
         }
 
-        .primo-input-group.query {
+        #primo-standalone-form .primo-input-group.query {
             flex: 1;
         }
 
-        select, input[type="text"] {
+        #primo-standalone-form select, #primo-standalone-form input[type="text"] {
             padding: 8px 12px;
             border: none;
             border-bottom: 1px solid #ddd;
@@ -106,28 +106,28 @@
             font-family: inherit;
         }
 
-        select:focus, input[type="text"]:focus {
+        #primo-standalone-form select:focus, input[type="text"]:focus {
             outline: none;
             border-bottom: 2px solid #1565c0;
         }
 
-        input[type="text"]::placeholder {
+        #primo-standalone-form input[type="text"]::placeholder {
             color: #999;
         }
 
-        .bool-operator {
+        #primo-standalone-form .bool-operator {
             font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
         }
 
-        .primo-button-row {
+        #primo-standalone-form .primo-button-row {
             display: flex;
             gap: 12px;
             margin-top: 16px;
         }
 
-        button {
+        #primo-standalone-form button {
             padding: 8px 16px;
             border: none;
             border-radius: 4px;
@@ -140,25 +140,25 @@
             transition: background-color 0.3s;
         }
 
-        .primo-btn-add {
+        #primo-standalone-form .primo-btn-add {
             background-color: transparent;
             color: #1565c0;
         }
 
-        .primo-btn-add:hover {
+        #primo-standalone-form .primo-btn-add:hover {
             background-color: #f0f0f0;
         }
 
-        .primo-btn-clear {
+        #primo-standalone-form .primo-btn-clear {
             background-color: transparent;
             color: #666;
         }
 
-        .primo-btn-clear:hover {
+        #primo-standalone-form .primo-btn-clear:hover {
             background-color: #f0f0f0;
         }
 
-        .primo-btn-search {
+        #primo-standalone-form .primo-btn-search {
             background-color: #1565c0;
             color: white;
             font-weight: 500;
@@ -166,69 +166,69 @@
             font-size: 15px;
         }
 
-        .primo-btn-search:hover {
+        #primo-standalone-form .primo-btn-search:hover {
             background-color: #0d47a1;
         }
 
-        .primo-filters-section {
+        #primo-standalone-form .primo-filters-section {
             display: flex;
             gap: 24px;
             margin-top: 24px;
         }
 
-        .primo-filters-left {
+        #primo-standalone-form .primo-filters-left {
             flex: 1;
         }
 
-        .primo-filters-right {
+        #primo-standalone-form .primo-filters-right {
             width: 300px;
         }
 
-        .primo-filter-group {
+        #primo-standalone-form .primo-filter-group {
             margin-bottom: 20px;
         }
 
-        .primo-filter-group label {
+        #primo-standalone-form .primo-filter-group label {
             display: block;
             font-size: 12px;
             color: #666;
             margin-bottom: 4px;
         }
 
-        .primo-divider {
+        #primo-standalone-form .primo-divider {
             height: 1px;
             background-color: #e0e0e0;
             margin: 20px 0;
         }
 
-        .primo-search-output {
+        #primo-standalone-form .primo-search-output {
             margin-top: 24px;
             padding: 16px;
             background-color: #f9f9f9;
             border-radius: 4px;
         }
 
-        .primo-icon {
+        #primo-standalone-form .primo-icon {
             width: 20px;
             height: 20px;
             fill: currentColor;
         }
         
         @media (max-width: 768px) {
-            .primo-search-row {
+            #primo-standalone-form .primo-search-row {
                 flex-wrap: wrap;
                 gap: 8px;
             }
 
-            .primo-input-group.query {
+            #primo-standalone-form .primo-input-group.query {
                 flex-basis: 100%;
             }
 
-            .primo-filters-section {
+            #primo-standalone-form .primo-filters-section {
                 flex-direction: column;
             }
 
-            .primo-filters-right {
+            #primo-standalone-form .primo-filters-right {
                 width: 100%;
             }
         }
