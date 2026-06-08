@@ -303,6 +303,8 @@
                                     <option value="books">Livres</option>
                                     <option value="journals">Revues</option>
                                     <option value="videos">Vidéos</option>
+                                    <option value="audios">CD</option>
+                                    <option value="images">Affiches</option>
                                     <option value="articles">Articles (en ligne uniquement)</option>
                                 </select>
                             </div>
@@ -546,9 +548,17 @@
 
             const materialType = document.getElementById('materialType').value;
             if (materialType !== 'all_items') {
-            // on utilise facet et non pfilter prévu dans le formulaire avancé par défaut pour rendre la facette visible dans la page de résultats
-                url.searchParams.append('facet', `rtype,include,${materialType}`);
-            }
+            // on utilise mfacet et non pfilter prévu dans le formulaire avancé par défaut pour rendre la facette visible dans la page de résultats
+			// mfacet=rtype,include,articles,1&mfacet=rtype,include,magazinearticle,1
+			// règle spécifique pour les articles
+				if (materialType === 'articles') {
+					url.searchParams.append('mfacet', 'rtype,include,articles,1')
+					url.searchParams.append('mfacet', 'rtype,include,magazinearticle,1')
+				}
+				else {
+					url.searchParams.append('facet', `rtype,include,${materialType}`);
+				}
+			}
 
             const language = document.getElementById('language').value;
             if (language !== 'all_items') {
