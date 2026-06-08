@@ -387,20 +387,32 @@
 
         let searchRows = [];
 
+
         function updateMaterialTypes() {
             const support = document.getElementById('support').value;
             const materialType = document.getElementById('materialType');
-            const onlyOnline = materialType.querySelector('option[value="articles"]');
-            const onlyOnline = materialType.querySelector('option[value="articles"]');
 
-            if (support === 'physical') {
-                onlyOnline.disabled = true;
+            const videosOption = materialType.querySelector('option[value="videos"]');
+            const audiosOption = materialType.querySelector('option[value="audios"]');
+            const imagesOption = materialType.querySelector('option[value="images"]');
+            const articlesOption = materialType.querySelector('option[value="articles"]');
 
-                if (materialType.value === 'articles') {
-                    materialType.value = 'all_items';
-                }
-            } else {
-                onlyOnline.disabled = false;
+            const physical = support === 'physical';
+
+            videosOption.disabled = !physical;
+            audiosOption.disabled = !physical;
+            imagesOption.disabled = !physical;
+            articlesOption.disabled = physical;
+
+            const disabledValues = [];
+
+            if (videosOption.disabled) disabledValues.push('videos');
+            if (audiosOption.disabled) disabledValues.push('audios');
+            if (imagesOption.disabled) disabledValues.push('images');
+            if (articlesOption.disabled) disabledValues.push('articles');
+
+            if (disabledValues.includes(materialType.value)) {
+                materialType.value = 'all_items';
             }
         }
 
