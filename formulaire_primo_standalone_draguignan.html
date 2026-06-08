@@ -237,25 +237,25 @@
             height: 20px;
             fill: currentColor;
         }
-		
-		@media (max-width: 768px) {
-			.search-row {
-				flex-wrap: wrap;
-				gap: 8px;
-			}
+        
+        @media (max-width: 768px) {
+            .search-row {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
 
-			.input-group.query {
-				flex-basis: 100%;
-			}
+            .input-group.query {
+                flex-basis: 100%;
+            }
 
-			.filters-section {
-				flex-direction: column;
-			}
+            .filters-section {
+                flex-direction: column;
+            }
 
-			.filters-right {
-				width: 100%;
-			}
-		}
+            .filters-right {
+                width: 100%;
+            }
+        }
 
     </style>
 </head>
@@ -549,16 +549,16 @@
             const materialType = document.getElementById('materialType').value;
             if (materialType !== 'all_items') {
             // on utilise mfacet et non pfilter prévu dans le formulaire avancé par défaut pour rendre la facette visible dans la page de résultats
-			// mfacet=rtype,include,articles,1&mfacet=rtype,include,magazinearticle,1
-			// règle spécifique pour les articles
-				if (materialType === 'articles') {
-					url.searchParams.append('mfacet', 'rtype,include,articles,1')
-					url.searchParams.append('mfacet', 'rtype,include,magazinearticle,1')
-				}
-				else {
-					url.searchParams.append('facet', `rtype,include,${materialType}`);
-				}
-			}
+            // mfacet=rtype,include,articles,1&mfacet=rtype,include,magazinearticle,1
+            // règle spécifique pour les articles
+                if (materialType === 'articles') {
+                    url.searchParams.append('mfacet', 'rtype,include,articles,1')
+                    url.searchParams.append('mfacet', 'rtype,include,magazinearticle,1')
+                }
+                else {
+                    url.searchParams.append('facet', `rtype,include,${materialType}`);
+                }
+            }
 
             const language = document.getElementById('language').value;
             if (language !== 'all_items') {
