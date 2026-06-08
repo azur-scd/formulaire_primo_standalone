@@ -390,16 +390,17 @@
         function updateMaterialTypes() {
             const support = document.getElementById('support').value;
             const materialType = document.getElementById('materialType');
-            const articleOption = materialType.querySelector('option[value="articles"]');
+            const onlyOnline = materialType.querySelector('option[value="articles"]');
+            const onlyOnline = materialType.querySelector('option[value="articles"]');
 
             if (support === 'physical') {
-                articleOption.disabled = true;
+                onlyOnline.disabled = true;
 
                 if (materialType.value === 'articles') {
                     materialType.value = 'all_items';
                 }
             } else {
-                articleOption.disabled = false;
+                onlyOnline.disabled = false;
             }
         }
 
