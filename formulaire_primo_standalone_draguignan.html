@@ -259,13 +259,13 @@
         <div class="primo-form">
             <div class="primo-form-left">
                 <!-- texte d'aide décrivant le fonctionnement des lignes de recherche, visible avec technologies d'assistance -->
-                <p id="searchHelp" class="sr-only">
-                    Pour chaque ligne, choisissez un champ à rechercher, un type de correspondance, puis saisissez un terme de recherche.
+                <p id="primoFormLeftSearchHelp" class="sr-only">
+                    Pour chaque ligne, choisissez au moins un champ à rechercher, un type de correspondance, puis saisissez un terme de recherche.
                     À partir de la deuxième ligne, vous pouvez choisir un opérateur booléen (ET, OU, SAUF) pour combiner les critères.
                 </p>
                 <!-- zone d'annonce pour les changements dynamiques, visible avec technologies d'assistance -->
-                <div id="formStatus" aria-live="polite" class="sr-only"></div>
-                <fieldset class="primo-search-criteria" aria-describedby="searchHelp">
+                <div id="primoFormLeftStatus" aria-live="polite" class="sr-only"></div>
+                <fieldset class="primo-search-criteria" aria-describedby="primoFormLeftSearchHelp">
                     <legend>Critères de recherche (titre, auteur, éditeur, sujet...)</legend>
                     <div id="searchRows"></div>
                     <div class="primo-button-row">
@@ -286,7 +286,11 @@
             </div>
 
             <div class="primo-form-right">
-                <fieldset class="primo-search-filters">
+            <p id="primoFormRightSearchHelp" class="sr-only">
+                    Filtre optionnel pour préciser la recherche par support (physique dans les collections de la BU INSPE Draguignan, ou en ligne), type de document, langue et date. Certains types de documents (affiches, vidéos, cd) ne sont sélectionnables que si le support physique est sélectionné. Le type article n'est sélectionnable que si le support en ligne est sélectionné. Les types livres et revues sont sélectionnables dans les deux cas.
+            </p>
+            <div id="primoFormRightStatus" aria-live="polite" class="sr-only"></div>
+                <fieldset class="primo-search-filters" aria-describedby="primoFormRightSearchHelp">
                     <legend>Filtres</legend>
                     <div class="primo-filter-group">
                         <label for="support">Support</label>
