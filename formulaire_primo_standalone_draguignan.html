@@ -53,16 +53,16 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        #primo-standalone-form .primo-search-criteria {
+        #primo-standalone-form .primo-search-criteria, #primo-standalone-form .primo-search-filters {
             margin-bottom: 24px;
         }
 
-        #primo-standalone-form .primo-search-criteria legend {
+        #primo-standalone-form .primo-search-criteria legend,  #primo-standalone-form .primo-search-filters legend  {
             font-size: 16px;
             font-weight: 500;
             margin-bottom: 16px;
             color: #333;
-        }
+        } 
 
         #primo-standalone-form .primo-search-row {
             display: flex;
@@ -175,17 +175,17 @@
             background-color: #0d47a1;
         }
 
-        #primo-standalone-form .primo-filters-section {
+        #primo-standalone-form .primo-form {
             display: flex;
             gap: 24px;
             margin-top: 24px;
         }
 
-        #primo-standalone-form .primo-filters-left {
+        #primo-standalone-form .primo-form-left {
             flex: 1;
         }
 
-        #primo-standalone-form .primo-filters-right {
+        #primo-standalone-form .primo-form-right {
             width: 300px;
         }
 
@@ -242,11 +242,11 @@
                 flex-basis: 100%;
             }
 
-            #primo-standalone-form .primo-filters-section {
+            #primo-standalone-form .primo-form {
                 flex-direction: column;
             }
 
-            #primo-standalone-form .primo-filters-right {
+            #primo-standalone-form .primo-form-right {
                 width: 100%;
             }
         }
@@ -255,8 +255,8 @@
 </head>
 <body>
     <form id="primo-standalone-form">
-        <div class="primo-filters-section">
-            <div class="primo-filters-left">
+        <div class="primo-form">
+            <div class="primo-form-left">
                 <!-- Correction 2 : texte d'aide décrivant le fonctionnement des lignes de recherche -->
                 <p id="searchHelp" class="sr-only">
                     Pour chaque ligne, choisissez un champ à rechercher, un type de correspondance, puis saisissez un terme de recherche.
@@ -287,8 +287,8 @@
                 </fieldset>
             </div>
 
-            <div class="primo-filters-right">
-                <fieldset class="search-filters">
+            <div class="primo-form-right">
+                <fieldset class="primo-search-filters">
                     <legend>Filtres</legend>
                     <div class="primo-filter-group">
                         <label for="support">Support</label>
