@@ -260,11 +260,10 @@
             <div class="primo-form-left">
                 <!-- texte d'aide décrivant le fonctionnement des lignes de recherche, visible avec technologies d'assistance -->
                 <p id="primoFormLeftSearchHelp" class="sr-only">
-                    Pour chaque ligne, choisissez au moins un champ à rechercher, un type de correspondance, puis saisissez un terme de recherche.
-                    À partir de la deuxième ligne, vous pouvez choisir un opérateur booléen (ET, OU, SAUF) pour combiner les critères.
+                    Pour chaque ligne, choisissez au moins un champ à rechercher, un type de correspondance, puis saisissez un terme de recherche. À partir de la deuxième ligne, vous pouvez choisir un opérateur booléen (ET, OU, SAUF) pour combiner les critères.
                 </p>
                 <!-- zone d'annonce pour les changements dynamiques, visible avec technologies d'assistance -->
-                <div id="primoFormLeftStatus" aria-live="polite" class="sr-only"></div>
+                <div id="primoFormStatus" aria-live="polite" class="sr-only"></div>
                 <fieldset class="primo-search-criteria" aria-describedby="primoFormLeftSearchHelp">
                     <legend>Critères de recherche (titre, auteur, éditeur, sujet...)</legend>
                     <div id="searchRows"></div>
@@ -289,7 +288,6 @@
             <p id="primoFormRightSearchHelp" class="sr-only">
                     Filtre optionnel pour préciser la recherche par support (physique dans les collections de la BU INSPE Draguignan, ou en ligne), type de document, langue et date. Certains types de documents (affiches, vidéos, cd) ne sont sélectionnables que si le support physique est sélectionné. Le type article n'est sélectionnable que si le support en ligne est sélectionné. Les types livres et revues sont sélectionnables dans les deux cas.
             </p>
-            <div id="primoFormRightStatus" aria-live="polite" class="sr-only"></div>
                 <fieldset class="primo-search-filters" aria-describedby="primoFormRightSearchHelp">
                     <legend>Filtres</legend>
                     <div class="primo-filter-group">
@@ -582,7 +580,7 @@
                 searchRows.push(createSearchRow(searchRows.length));
                 renderSearchRows();
                 const newRowNumber = searchRows.length;
-                document.getElementById('formStatus').textContent = `Ligne de recherche ${newRowNumber} ajoutée`;
+                document.getElementById('primoFormStatus').textContent = `Ligne de recherche ${newRowNumber} ajoutée`;
                 const rows = document.querySelectorAll('#searchRows .primo-search-row');
                 const lastRow = rows[rows.length - 1];
                 if (lastRow) {
@@ -604,8 +602,7 @@
             document.getElementById('materialType').value = 'all_items';
             document.getElementById('language').value = 'all_items';
             document.getElementById('publicationDate').value = 'all_items';
-            // Correction 3 : annonce de la réinitialisation via la zone live
-            document.getElementById('formStatus').textContent = 'Formulaire réinitialisé';
+            document.getElementById('primoFormStatus').textContent = 'Formulaire et filtres réinitialisés';
         });
 
         // Gestion de la soumission du formulaire.
@@ -621,6 +618,12 @@
                 alert('Veuillez saisir au moins un terme de recherche.');
                 return;
             }
+            // Le * seul ne permet pas de rechercher tous les documents
+            
+            const hasOnlyWildcard = searchRows.some(row => row.query.trim() === '*');
+            if (hasOnlyWildcard) {
+                alert("Le caractère * ne permet pas de faire une recherche générale de tous les documents. Vous ne pouvez l'utiliser qu'en troncature à la fin d'un mot.");
+            return;}
 
             // Création de l'objet URL qui recevra progressivement
             // tous les paramètres de recherche et de facettes.
