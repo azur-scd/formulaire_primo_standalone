@@ -271,7 +271,7 @@
             <div class="primo-form-left">
                 <!-- texte d'aide décrivant le fonctionnement des lignes de recherche, visible avec technologies d'assistance -->
                 <p id="primoFormLeftSearchHelp" class="sr-only">
-                    Pour chaque ligne, choisissez au moins un champ à rechercher, un type de correspondance, puis saisissez un terme de recherche. À partir de la deuxième ligne, vous pouvez choisir un opérateur booléen (ET, OU, SAUF) pour combiner les critères.
+                    Pour chaque ligne, choisissez au moins un champ à rechercher, un type de correspondance, puis saisissez un terme de recherche. À partir de la deuxième ligne, vous pouvez ch[...]
                 </p>
                 <!-- zone d'annonce pour les changements dynamiques, visible avec technologies d'assistance -->
                 <div id="primoFormStatus" aria-live="polite" class="sr-only"></div>
@@ -291,7 +291,7 @@
 
             <div class="primo-form-right">
             <p id="primoFormRightSearchHelp" class="sr-only">
-                    Filtre optionnel pour préciser la recherche par support (physique dans les collections de la bibliothèque, ou en ligne), type de document, langue et date. Certains types de documents (affiches, vidéos, cd) ne sont sélectionnables que si le support physique est sélectionné. Le type article n'est sélectionnable que si le support en ligne est sélectionné. Les types livres et revues sont sélectionnables dans les deux cas.
+                    Filtre optionnel pour préciser la recherche par support (physique dans les collections de la bibliothèque, ou en ligne), type de document, langue et date. Certains types de [...] 
             </p>
                 <fieldset class="primo-search-filters" aria-describedby="primoFormRightSearchHelp">
                     <legend>Filtres</legend>
@@ -362,20 +362,11 @@
     </form>
 
     <script>
-        // URL de base de Primo vers laquelle le formulaire va rediriger l'utilisateur.
-        // On ne lance jamais la recherche directement côté formulaire :
-        // on construit simplement une URL complète avec les bons paramètres.
         const baseUrl = 'https://catalogue.bu.univ-cotedazur.fr/primo-explore/search';
-
-        // CODE A MODIFIER POUR FILTRER SUR UNE BIBLIOTHEQUE PARTICULIERE
-        // ex: DRAGUIGNAN, LJAD...
         const code_bibliotheque = '';
         const label_bibliotheque = '';
         const recherche_reseau = false;
 
-        // Paramètres communs ajoutés à toutes les recherches.
-        // Ils fixent le contexte Primo : onglet utilisé, scope, vue, langue,
-        // mode avancé et offset de départ dans les résultats.
         const defaultParams = {
             tab: 'default_tab',
             search_scope: 'all',
@@ -385,9 +376,6 @@
             offset: '0'
         };
 
-        // Liste des champs interrogeables dans Primo.
-        // Chaque valeur correspond au code attendu par l'URL Primo,
-        // tandis que "label" correspond au texte affiché à l'écran.
         const categories = [
             { value: 'any', label: 'Tous les champs' },
             { value: 'title', label: 'Titre' },
@@ -400,47 +388,36 @@
             { value: 'lsr07', label: 'Cote et code-barre' }
         ];
 
-        // Liste des opérateurs de recherche textuelle proposés à l'usager.
-        // Là encore, la propriété "value" est celle attendue par Primo.
         const operators = [
             { value: 'contains', label: 'contient' },
             { value: 'exact', label: 'est égal à' },
             { value: 'startswith', label: 'commence par' }
         ];
 
-        // Liste des opérateurs booléens qui relient les lignes entre elles.
-        // Important : le premier critère n'affiche pas de booléen,
-        // mais les lignes suivantes peuvent être reliées par AND / OR / NOT.
         const boolOperators = [
             { value: 'AND', label: 'ET' },
             { value: 'OR', label: 'OU' },
             { value: 'NOT', label: 'SAUF' }
         ];
 
-        // Tableau d'état principal du formulaire pour la partie "lignes de recherche".
-        // Chaque objet du tableau représente une ligne visible à l'écran.
-        // Le rendu HTML est régénéré à partir de ce tableau.
         let searchRows = [];
 
-
-        // Cette fonction adapte la liste des types de document au support choisi.
-        // Si l'on recherche uniquement des contenus en ligne les types purement physiques
-        // (vidéos, CD, affiches) sont non sélectionnables.
-        // À l'inverse, le type "articles" n'est sélectionnable que si on cherche des contenus en ligne.
         function updateMaterialTypes() {
             const support = document.getElementById('support').value;
             const materialType = document.getElementById('materialType');
+            const physical = support === 'physical';
+            const réseau = support === 'all_libraries';
+
+            if (réseau) {
+                materialType.value = 'all_items';
+                return;
+            }
 
             const videosOption = materialType.querySelector('option[value="videos"]');
             const audiosOption = materialType.querySelector('option[value="audios"]');
             const imagesOption = materialType.querySelector('option[value="images"]');
             const articlesOption = materialType.querySelector('option[value="articles"]');
 
-            const physical = support === 'physical';
-
-            // Si support = physique, on autorise vidéos / CD / affiches
-            // et on bloque les articles.
-            // Si support = en ligne, c'est l'inverse pour ces options spécifiques.
             videosOption.disabled = !physical;
             audiosOption.disabled = !physical;
             imagesOption.disabled = !physical;
@@ -453,17 +430,11 @@
             if (imagesOption.disabled) disabledValues.push('images');
             if (articlesOption.disabled) disabledValues.push('articles');
 
-            // Si l'utilisateur avait sélectionné une option désormais interdite,
-            // on revient automatiquement à "Tous types" pour éviter
-            // de conserver un état incohérent dans le formulaire.
             if (disabledValues.includes(materialType.value)) {
                 materialType.value = 'all_items';
             }
         }
 
-        // Fabrique l'objet JavaScript représentant une ligne de recherche.
-        // L'index n'est pas utilisé directement ici pour construire l'objet,
-        // mais il est passé pour cohérence avec l'appelant et une éventuelle évolution.
         function createSearchRow(index) {
             return {
                 boolOperator: 'AND',
@@ -473,10 +444,6 @@
             };
         }
 
-        // Fonction centrale de rendu des lignes de recherche.
-        // Elle vide le conteneur HTML puis reconstruit toutes les lignes
-        // à partir du tableau searchRows.
-        // Cette approche garantit que l'affichage reflète toujours l'état interne.
         function renderSearchRows() {
             const container = document.getElementById('searchRows');
             container.innerHTML = '';
@@ -486,15 +453,10 @@
                 rowDiv.className = 'primo-search-row';
 
                 if (index === 0) {
-                    // La première ligne n'a pas d'opérateur booléen affiché.
-                    // On place donc un simple espace vide de même largeur
-                    // pour conserver l'alignement visuel avec les lignes suivantes.
                     const spacerGroup = document.createElement('div');
                     spacerGroup.className = 'primo-input-group spacer';
                     rowDiv.appendChild(spacerGroup);
                 } else {
-                    // À partir de la deuxième ligne, on affiche le sélecteur booléen
-                    // qui permet de relier cette ligne à la précédente.
                     const boolGroup = document.createElement('div');
                     boolGroup.className = 'primo-input-group bool';
                     const boolSelect = document.createElement('select');
@@ -507,9 +469,6 @@
                         option.selected = row.boolOperator === op.value;
                         boolSelect.appendChild(option);
                     });
-
-                    // À chaque changement, on met à jour l'état interne,
-                    // sans rerender immédiat car le select existe déjà dans le DOM.
                     boolSelect.addEventListener('change', (e) => {
                         searchRows[index].boolOperator = e.target.value;
                     });
@@ -517,11 +476,9 @@
                     rowDiv.appendChild(boolGroup);
                 }
 
-                // Sélecteur du champ interrogé (titre, auteur, sujet, etc.).
                 const categoryGroup = document.createElement('div');
                 categoryGroup.className = 'primo-input-group category';
                 const categorySelect = document.createElement('select');
-                // Correction 1 : nom accessible pour le sélecteur de champ
                 categorySelect.setAttribute('aria-label', `Champ recherché de la ligne ${index + 1}`);
                 categories.forEach(cat => {
                     const option = document.createElement('option');
@@ -536,8 +493,6 @@
                 categoryGroup.appendChild(categorySelect);
                 rowDiv.appendChild(categoryGroup);
 
-                // Sélecteur du type de correspondance textuelle.
-                // Exemple : contient / exact / commence par.
                 const operatorGroup = document.createElement('div');
                 operatorGroup.className = 'primo-input-group operator';
                 const operatorSelect = document.createElement('select');
@@ -555,9 +510,6 @@
                 operatorGroup.appendChild(operatorSelect);
                 rowDiv.appendChild(operatorGroup);
 
-                // Champ texte de la requête saisie par l'usager.
-                // À chaque frappe, on synchronise l'objet correspondant
-                // dans le tableau searchRows.
                 const queryGroup = document.createElement('div');
                 queryGroup.className = 'primo-input-group query';
                 const queryInput = document.createElement('input');
@@ -575,9 +527,6 @@
             });
 
             const addBtn = document.getElementById('addRowBtn');
-
-            // On masque le bouton d'ajout à partir de 7 lignes,
-            // conformément à la règle métier définie au début du fichier.
             if (searchRows.length >= 7) {
                 addBtn.style.display = 'none';
             } else {
@@ -585,15 +534,11 @@
             }
         }
 
-        // Initialise le formulaire avec 2 lignes vides,
-        // ce qui correspond au comportement attendu au chargement.
         function initializeForm() {
             searchRows = [createSearchRow(0), createSearchRow(1)];
             renderSearchRows();
         }
 
-        // Ajout d'une ligne supplémentaire jusqu'à un maximum de 7.
-        // Après modification du tableau d'état, on relance le rendu complet.
         document.getElementById('addRowBtn').addEventListener('click', () => {
             if (searchRows.length < 7) {
                 searchRows.push(createSearchRow(searchRows.length));
@@ -609,11 +554,6 @@
             }
         });
 
-        // Réinitialisation complète du formulaire.
-        // On remet :
-        // - 2 lignes de recherche vides
-        // - le support sur "physique"
-        // - tous les filtres sur leur valeur par défaut
         document.getElementById('clearBtn').addEventListener('click', () => {
             searchRows = [createSearchRow(0), createSearchRow(1)];
             renderSearchRows();
@@ -624,34 +564,22 @@
             document.getElementById('primoFormStatus').textContent = 'Formulaire et filtres réinitialisés';
         });
 
-        // Gestion de la soumission du formulaire.
-        // Au lieu d'envoyer un formulaire HTML classique,
-        // on empêche l'envoi natif pour construire manuellement l'URL Primo.
         document.getElementById('primo-standalone-form').addEventListener('submit', (e) => {
             e.preventDefault();
 
-            // Vérification minimale : il faut au moins un terme saisi
-            // dans une des lignes de recherche.
             const hasQuery = searchRows.some(row => row.query.trim() !== '');
             if (!hasQuery) {
                 alert('Veuillez saisir au moins un terme de recherche.');
                 return;
             }
-            // Le * seul ne permet pas de rechercher tous les documents
             
             const hasOnlyWildcard = searchRows.some(row => row.query.trim() === '*');
             if (hasOnlyWildcard) {
                 alert("Le caractère * ne permet pas de faire une recherche générale de tous les documents. Vous ne pouvez l'utiliser qu'en troncature à la fin d'un mot.");
             return;}
 
-            // Création de l'objet URL qui recevra progressivement
-            // tous les paramètres de recherche et de facettes.
             const url = new URL(baseUrl);
 
-            // Primo rattache l'opérateur booléen affiché sur une ligne à la liaison
-            // avec la ligne précédente. On construit donc la requête à partir des
-            // seules lignes remplies, puis on porte le booléen de la ligne suivante
-            // sur la ligne courante.
             const filledRows = searchRows.filter(row => row.query.trim() !== '');
             filledRows.forEach((row, index) => {
                 const boolOp = index < filledRows.length - 1
@@ -661,22 +589,15 @@
                 url.searchParams.append('query', queryStr);
             });
 
-            // Filtre de support.
-            // - online => ressources en ligne
-            // - sinon => limitation à la bibliothèque
             const support = document.getElementById('support').value;
             if (support === 'online') {
                 url.searchParams.append('facet', 'tlevel,include,online_resources');
-            } else {
+            } else if (support === 'physical') {
                 url.searchParams.append('facet', 'library,include'+code_bibliotheque);
             }
 
             const materialType = document.getElementById('materialType').value;
             if (materialType !== 'all_items') {
-            // On utilise mfacet et non pfilter prévu dans le formulaire avancé par défaut
-            // pour rendre la facette visible dans la page de résultats.
-            // Cas particulier : "articles" correspond en réalité à deux types Primo,
-            // donc on ajoute deux paramètres mfacet distincts.
                 if (materialType === 'articles') {
                     url.searchParams.append('mfacet', 'rtype,include,articles,1')
                     url.searchParams.append('mfacet', 'rtype,include,magazinearticle,1')
@@ -688,16 +609,11 @@
 
             const language = document.getElementById('language').value;
             if (language !== 'all_items') {
-            // On utilise facet et non pfilter afin que la facette reste visible
-            // dans l'interface de résultats Primo.
                 url.searchParams.append('facet', `lang,include,${language}`);
             }
 
             const pubDate = document.getElementById('publicationDate').value;
             if (pubDate !== 'all_items') {
-            // Ici, on calcule dynamiquement une plage d'années à partir de l'année courante.
-            // Le format attendu par Primo est :
-            // searchcreationdate,include,annéeDébut|,|annéeFin
                 const currentYear = new Date().getFullYear();
                 let startYear;
                 let endYear;
@@ -730,22 +646,15 @@
                 );
             }
 
-            // Ajout final des paramètres Primo communs à toutes les recherches.
             Object.entries(defaultParams).forEach(([key, value]) => {
                 url.searchParams.append(key, value);
             });
 
-            // Ouverture du résultat dans un nouvel onglet,
-            // sans quitter la page contenant le formulaire.
             window.open(url.toString(), '_blank');
         });
 
-        // Quand le support change, on ajuste immédiatement les types de document disponibles.
         document.getElementById('support').addEventListener('change', updateMaterialTypes);
 
-        // Initialisation au chargement de la page.
-        // 1) on crée les deux premières lignes
-        // 2) on applique la logique de compatibilité des types de documents
         initializeForm();
         updateMaterialTypes();
 
