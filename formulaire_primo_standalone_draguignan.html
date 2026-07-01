@@ -406,9 +406,9 @@
             const support = document.getElementById('support').value;
             const materialType = document.getElementById('materialType');
             const physical = support === 'physical';
-            const réseau = support === 'all_libraries';
+            const all_libraries = support === 'all_libraries';
 
-            if (réseau) {
+            if (all_libraries) {
                 materialType.value = 'all_items';
                 return;
             }
