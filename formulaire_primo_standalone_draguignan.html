@@ -2,7 +2,6 @@
 <html lang="fr">
 
 <!-- Formulaire de recherche avancée déporté pour Primo BO adapté aux spécificités UniCA -->
-<!-- Ciblé sur la BU Draguignan -->
 <!-- Génération dynamique de 2 à 7 lignes de recherche. -->
 <!-- Champs disponibles : -->
 <!-- Tous les champs -->
@@ -28,7 +27,7 @@
 <!-- Langue -->
 <!-- Date de publication -->
 <!-- Pour le support : -->
-<!-- Physique ⇒ facet=library,include,DRAGUIGNAN -->
+<!-- Physique ⇒ A MODIFIER POUR FILTRER. AJOUTER LE CODE PRIMO DE LA BU. EX : facet=library,include,DRAGUIGNAN -->
 <!-- En ligne ⇒ facet=tlevel,include,online_resources -->
 <!-- Paramètres Primo par défaut : -->
 <!-- tab=default_tab -->
@@ -42,7 +41,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulaire Primo déporté ciblant Draguignan, pour intégration au site DiBSO</title>
+    <title>Formulaire Primo déporté, pour intégration au site DiBSO ou externe</title>
     <style>
 
         #primo-standalone-form {
@@ -292,14 +291,14 @@
 
             <div class="primo-form-right">
             <p id="primoFormRightSearchHelp" class="sr-only">
-                    Filtre optionnel pour préciser la recherche par support (physique dans les collections de la BU INSPE Draguignan, ou en ligne), type de document, langue et date. Certains types de documents (affiches, vidéos, cd) ne sont sélectionnables que si le support physique est sélectionné. Le type article n'est sélectionnable que si le support en ligne est sélectionné. Les types livres et revues sont sélectionnables dans les deux cas.
+                    Filtre optionnel pour préciser la recherche par support (physique dans les collections de la bibliothèque, ou en ligne), type de document, langue et date. Certains types de documents (affiches, vidéos, cd) ne sont sélectionnables que si le support physique est sélectionné. Le type article n'est sélectionnable que si le support en ligne est sélectionné. Les types livres et revues sont sélectionnables dans les deux cas.
             </p>
                 <fieldset class="primo-search-filters" aria-describedby="primoFormRightSearchHelp">
                     <legend>Filtres</legend>
                     <div class="primo-filter-group">
                         <label for="support">Support</label>
                         <select id="support" name="support" required>
-                            <option value="physical" selected>Physique (BU INSPE Draguignan)</option>
+                            <option value="physical" selected>Physique</option>
                             <option value="online">En ligne</option>
                         </select>
                     </div>
@@ -367,6 +366,10 @@
         // On ne lance jamais la recherche directement côté formulaire :
         // on construit simplement une URL complète avec les bons paramètres.
         const baseUrl = 'https://catalogue.bu.univ-cotedazur.fr/primo-explore/search';
+
+        // CODE A MODIFIER POUR FILTRER SUR UNE BIBLIOTHEQUE PARTICULIERE
+        // ex: DRAGUIGNAN, LJAD...
+        const code_bibliotheque = '';
 
         // Paramètres communs ajoutés à toutes les recherches.
         // Ils fixent le contexte Primo : onglet utilisé, scope, vue, langue,
@@ -658,12 +661,12 @@
 
             // Filtre de support.
             // - online => ressources en ligne
-            // - sinon => limitation à la bibliothèque de Draguignan
+            // - sinon => limitation à la bibliothèque
             const support = document.getElementById('support').value;
             if (support === 'online') {
                 url.searchParams.append('facet', 'tlevel,include,online_resources');
             } else {
-                url.searchParams.append('facet', 'library,include,DRAGUIGNAN');
+                url.searchParams.append('facet', 'library,include'+code_bibliotheque);
             }
 
             const materialType = document.getElementById('materialType').value;
