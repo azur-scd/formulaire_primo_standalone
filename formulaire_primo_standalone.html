@@ -370,7 +370,7 @@
             <div class="primo-search-actions">
                 <button type="submit" class="primo-btn-search">
                     <svg class="primo-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                        <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5A4.5,4.5 0 0,0 5,9.5C5,11.43 6.14,13.07 7.8,13.82L8.06,13.94L8.14,14.22L8.25,14.5L8.28,14.68L8.2,14.94L8.09,15.2L8,15.38L7.67,15.72L7.38,16L7.14,16.14L6.97,16.24L6.68,16.43L6.44,16.6L6.17,16.71L5.9,16.8L5.6,16.89L5.33,16.99L5.13,17.06L4.9,17.09L4.61,17.13L4.35,17.18L4,17.28L3.71,17.36L3.49,17.44L3.22,17.53L2.94,17.62L2.62,17.74L2.38,17.81L2.1,17.93L1.9,18.04L1.72,18.13L1.5,18.24L1.39,18.3L1.2,18.42L0.94,18.62L0.77,18.76L0.6,18.9L0.45,19.08L0.31,19.29L0.18,19.52L0.1,19.81L0.05,20.07V20.39L0.1,20.7L0.18,21.12L0.31,21.44L0.45,21.75L0.6,22.02L0.77,22.26L0.94,22.49L1.2,22.72L1.39,22.85L1.5,22.9L1.72,23L1.9,23.1L2.1,23.2L2.38,23.29L2.62,23.38L2.94,23.5L3.22,23.62L3.49,23.72L3.71,23.81L4,23.9L4.35,24L4.61,24.03L4.9,24.08L5.13,24.13L5.33,24.2L5.6,24.3L5.9,24.4L6.17,24.5L6.44,24.67L6.68,24.84L6.97,25.08L7.14,25.19L7.38,25.33L7.67,25.56L8,25.8L8.2,26L8.28,26.23L8.25,26.52L8.14,26.76L8.06,27.08L7.8,27.23C6.14,27.99 5,29.57 5,31.5A4.5,4.5 0 0,0 9.5,36A4.5,4.5 0 0,0 14,31.5A4.5,4.5 0 0,0 9.5,27A4.5,4.5 0 0,0 5,31.5H3A6.5,6.5 0 0,1 9.5,25A6.5,6.5 0 0,1 16,31.5A6.5,6.5 0 0,1 9.5,38A6.5,6.5 0 0,1 3,31.5A6.5,6.5 0 0,1 9.5,25Z"/>
+                        <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.[...]
                     </svg>
                     Rechercher
                     <span class="sr-only">(ouvre les résultats dans un nouvel onglet)</span>
@@ -391,6 +391,9 @@
         const code_bibliotheque = '';
         const label_bibliotheque = '';
         const recherche_reseau = false;
+        // Paramètres communs ajoutés à toutes les recherches.
+        // Ils fixent le contexte Primo : onglet utilisé, scope, vue, langue,
+        // mode avancé et offset de départ dans les résultats.
         const defaultParams = {
             tab: 'default_tab',
             search_scope: 'all',
@@ -399,6 +402,8 @@
             mode: 'advanced',
             offset: '0'
         };
+        // Liste des champs interrogeables dans Primo.
+        // Chaque "value" correspond au code attendu par l'URL Primo, chaque "label" correspond au texte affiché à l'écran.
         const categories = [
             { value: 'any', label: 'Tous les champs' },
             { value: 'title', label: 'Titre' },
@@ -410,18 +415,31 @@
             { value: 'cdate', label: 'Date de publication' },
             { value: 'lsr07', label: 'Cote et code-barre' }
         ];
+        // Liste des opérateurs de recherche proposés à l'usager.
+        // L'opérateur "Commence par" ne fonctionne qu'avec certains index. 
+        // Chaque "value" correspond au code attendu par l'URL Primo, chaque "label" correspond au texte affiché à l'écran.
         const operators = [
             { value: 'contains', label: 'contient' },
             { value: 'exact', label: 'est égal à' },
             { value: 'startswith', label: 'commence par' }
         ];
+        // Liste des opérateurs booléens qui relient les lignes entre elles.
+        // Important : le premier critère n'affiche pas de booléen,
+        // mais les critères suivants peuvent être reliés par AND / OR / NOT.
         const boolOperators = [
             { value: 'AND', label: 'ET' },
             { value: 'OR', label: 'OU' },
             { value: 'NOT', label: 'SAUF' }
         ];
+        
+        // Tableau d'état principal du formulaire pour la partie "lignes de recherche".
+        // Chaque objet du tableau représente une ligne visible à l'écran.
+        // Le rendu HTML est régénéré à partir de ce tableau.
         let searchRows = [];
 
+        // Cette fonction adapte la liste des types de document au support choisi.
+        // Si l'on recherche uniquement des contenus en ligne les types purement physiques (vidéos, CD, affiches) sont non sélectionnables.
+        // À l'inverse, le type "articles" n'est sélectionnable que si on cherche des contenus en ligne.
         function updateMaterialTypes() {
             const support = document.getElementById('support').value;
             const materialType = document.getElementById('materialType');
@@ -450,11 +468,15 @@
             if (imagesOption.disabled) disabledValues.push('images');
             if (articlesOption.disabled) disabledValues.push('articles');
 
+            // Si l'utilisateur avait sélectionné une option désormais interdite on revient à "Tous types" pour éviter de de conserver un état incohérent dans le formulaire.
             if (disabledValues.includes(materialType.value)) {
                 materialType.value = 'all_items';
             }
         }
-
+        
+        // Fabrique l'objet JavaScript représentant une ligne de recherche.
+        // L'index n'est pas utilisé directement ici pour construire l'objet,
+        // mais il est passé pour cohérence avec l'appelant et une éventuelle évolution.
         function createSearchRow(index) {
             return {
                 boolOperator: 'AND',
@@ -463,7 +485,10 @@
                 query: ''
             };
         }
-
+ 
+        // Fonction centrale de rendu des lignes de recherche.
+        // Elle vide le conteneur HTML puis reconstruit toutes les lignes à partir du tableau searchRows.
+        // Cette approche garantit que l'affichage reflète toujours l'état interne.
         function renderSearchRows() {
             const container = document.getElementById('searchRows');
             container.innerHTML = '';
@@ -473,10 +498,15 @@
                 rowDiv.className = 'primo-search-row';
 
                 if (index === 0) {
+                    // La première ligne n'a pas d'opérateur booléen affiché.
+                    // On place donc un simple espace vide de même largeur
+                    // pour conserver l'alignement visuel avec les lignes suivantes.
                     const spacerGroup = document.createElement('div');
                     spacerGroup.className = 'primo-input-group spacer';
                     rowDiv.appendChild(spacerGroup);
                 } else {
+                    // À partir de la deuxième ligne, on affiche le sélecteur booléen
+                    // qui permet de relier cette ligne à la précédente.
                     const boolGroup = document.createElement('div');
                     boolGroup.className = 'primo-input-group bool';
                     const boolSelect = document.createElement('select');
@@ -489,6 +519,8 @@
                         option.selected = row.boolOperator === op.value;
                         boolSelect.appendChild(option);
                     });
+                    // À chaque changement, on met à jour l'état interne,
+                    // sans rerender immédiat car le select existe déjà dans le DOM.
                     boolSelect.addEventListener('change', (e) => {
                         searchRows[index].boolOperator = e.target.value;
                     });
@@ -496,6 +528,7 @@
                     rowDiv.appendChild(boolGroup);
                 }
 
+                // Sélecteur du champ interrogé (titre, auteur, sujet, etc.).
                 const categoryGroup = document.createElement('div');
                 categoryGroup.className = 'primo-input-group category';
                 const categorySelect = document.createElement('select');
@@ -513,6 +546,8 @@
                 categoryGroup.appendChild(categorySelect);
                 rowDiv.appendChild(categoryGroup);
 
+                // Sélecteur du type de correspondance textuelle.
+                // Exemple : contient / exact / commence par.
                 const operatorGroup = document.createElement('div');
                 operatorGroup.className = 'primo-input-group operator';
                 const operatorSelect = document.createElement('select');
@@ -530,6 +565,8 @@
                 operatorGroup.appendChild(operatorSelect);
                 rowDiv.appendChild(operatorGroup);
 
+                // Champ texte de la requête saisie par l'usager.
+                // À chaque frappe, on synchronise l'objet correspondant dans le tableau searchRows.
                 const queryGroup = document.createElement('div');
                 queryGroup.className = 'primo-input-group query';
                 const queryInput = document.createElement('input');
@@ -547,18 +584,24 @@
             });
 
             const addBtn = document.getElementById('addRowBtn');
+            // On masque le bouton d'ajout à partir de 7 lignes,
+            // conformément à la règle métier définie au début du fichier.
             if (searchRows.length >= max_rows) {
                 addBtn.style.display = 'none';
             } else {
                 addBtn.style.display = 'flex';
             }
         }
-
+        
+        // Initialise le formulaire avec 2 lignes vides,
+        // ce qui correspond au comportement attendu au chargement.
         function initializeForm() {
             searchRows = [createSearchRow(0), createSearchRow(1)];
             renderSearchRows();
         }
 
+        // Ajout d'une ligne supplémentaire jusqu'à un maximum de 7.
+        // Après modification du tableau d'état, on relance le rendu complet.
         document.getElementById('addRowBtn').addEventListener('click', () => {
             if (searchRows.length < max_rows) {
                 searchRows.push(createSearchRow(searchRows.length));
@@ -574,6 +617,11 @@
             }
         });
 
+        // Réinitialisation complète du formulaire.
+        // On remet :
+        // - 2 lignes de recherche vides
+        // - le support sur "physique"
+        // - tous les filtres sur leur valeur par défaut
         document.getElementById('clearBtn').addEventListener('click', () => {
             searchRows = [createSearchRow(0), createSearchRow(1)];
             renderSearchRows();
@@ -582,32 +630,45 @@
             document.getElementById('language').value = 'all_items';
             document.getElementById('publicationDate').value = 'all_items';
             document.getElementById('primoFormStatus').textContent = 'Formulaire et filtres réinitialisés';
-            updateSupportLabel();
         });
 
+        // Gestion de la soumission du formulaire.
+        // Au lieu d'envoyer un formulaire HTML classique,
+        // on empêche l'envoi natif pour construire manuellement l'URL Primo.
         document.getElementById('primo-standalone-form').addEventListener('submit', (e) => {
             e.preventDefault();
 
+            // Vérification minimale : il faut au moins un terme saisi dans une des lignes de recherche.
             const hasQuery = searchRows.some(row => row.query.trim() !== '');
             if (!hasQuery) {
                 alert('Veuillez saisir au moins un terme de recherche.');
                 return;
             }
-
+            
+            // Le * seul ne permet pas de rechercher tous les documents contrairement à d'autres outils
             const hasOnlyWildcard = searchRows.some(row => row.query.trim() === '*');
             if (hasOnlyWildcard) {
                 alert("Le caractère * ne permet pas de faire une recherche générale de tous les documents. Vous ne pouvez l'utiliser qu'en troncature à la fin d'un mot.");
-                return;
-            }
+            return;}
 
             const url = new URL(baseUrl);
+
+            // Primo rattache l'opérateur booléen affiché sur une ligne à la liaison
+            // avec la ligne précédente. On construit donc la requête à partir des
+            // seules lignes remplies, puis on porte le booléen de la ligne suivante
+            // sur la ligne courante.
             const filledRows = searchRows.filter(row => row.query.trim() !== '');
             filledRows.forEach((row, index) => {
-                const boolOp = index < filledRows.length - 1 ? filledRows[index + 1].boolOperator : 'AND';
+                const boolOp = index < filledRows.length - 1
+                    ? filledRows[index + 1].boolOperator
+                    : 'AND';
                 const queryStr = `${row.category},${row.operator},${row.query},${boolOp}`;
                 url.searchParams.append('query', queryStr);
             });
 
+            // Filtre de support.
+            // - online => ressources en ligne
+            // - sinon => limitation à la bibliothèque de Draguignan
             const support = document.getElementById('support').value;
             if (support === 'online') {
                 url.searchParams.append('facet', 'tlevel,include,online_resources');
@@ -615,23 +676,32 @@
                 url.searchParams.append('facet', 'library,include,' + code_bibliotheque);
             }
 
+            // On utilise mfacet et non pfilter prévu dans le formulaire avancé par défaut
+            // pour rendre la facette visible dans la page de résultats.
+            // Cas particulier : "articles" correspond en réalité à deux types Primo,
+            // donc on ajoute deux paramètres mfacet distincts.
             const materialType = document.getElementById('materialType').value;
             if (materialType !== 'all_items') {
                 if (materialType === 'articles') {
-                    url.searchParams.append('mfacet', 'rtype,include,articles,1');
-                    url.searchParams.append('mfacet', 'rtype,include,magazinearticle,1');
-                } else {
+                    url.searchParams.append('mfacet', 'rtype,include,articles,1')
+                    url.searchParams.append('mfacet', 'rtype,include,magazinearticle,1')
+                }
+                else {
                     url.searchParams.append('facet', `rtype,include,${materialType}`);
                 }
             }
 
             const language = document.getElementById('language').value;
             if (language !== 'all_items') {
+            // Contrairement au formulaire de recherche avancée standard on utilise facet et non pfilter afin que la facette reste visible dans l'interface de résultats Primo.
                 url.searchParams.append('facet', `lang,include,${language}`);
             }
 
             const pubDate = document.getElementById('publicationDate').value;
             if (pubDate !== 'all_items') {
+            // Contrairement au formulaire de recherche avancée standard on calcule dynamiquement une plage d'années à partir de l'année courante.
+            // Le format attendu par Primo est :
+            // searchcreationdate,include,annéeDébut|,|annéeFin    
                 const currentYear = new Date().getFullYear();
                 let startYear;
                 let endYear;
@@ -641,23 +711,30 @@
                         startYear = currentYear;
                         endYear = currentYear;
                         break;
+
                     case 'previous_year':
                         startYear = currentYear - 1;
                         endYear = currentYear;
                         break;
+
                     case 'last_5_years':
                         startYear = currentYear - 5;
                         endYear = currentYear;
                         break;
+
                     case 'last_10_years':
                         startYear = currentYear - 10;
                         endYear = currentYear;
                         break;
                 }
 
-                url.searchParams.append('facet', `searchcreationdate,include,${startYear}|,|${endYear}`);
+                url.searchParams.append(
+                    'facet',
+                    `searchcreationdate,include,${startYear}|,|${endYear}`
+                );
             }
 
+            // Ajout final des paramètres Primo communs à toutes les recherches.
             Object.entries(defaultParams).forEach(([key, value]) => {
                 url.searchParams.append(key, value);
             });
@@ -665,21 +742,286 @@
             window.open(url.toString(), '_blank');
         });
 
-        document.getElementById('support').addEventListener('change', () => {
-            updateMaterialTypes();
-        });
+        // Quand le support change, on ajuste immédiatement les types de document disponibles.
+        document.getElementById('support').addEventListener('change', updateMaterialTypes);
 
-        function updateSupportLabel() {
-            const physicalOption = document.querySelector('#support option[value="physical"]');
-            if (!physicalOption) return;
+        // Fabrique l'objet JavaScript représentant une ligne de recherche.
+        // L'index n'est pas utilisé directement ici pour construire l'objet,
+        // mais il est passé pour cohérence avec l'appelant et une éventuelle évolution.
+        function createSearchRow(index) {
+            return {
+                boolOperator: 'AND',
+                category: 'any',
+                operator: 'contains',
+                query: ''
+            };
+        }
+ 
+        // Fonction centrale de rendu des lignes de recherche.
+        // Elle vide le conteneur HTML puis reconstruit toutes les lignes à partir du tableau searchRows.
+        // Cette approche garantit que l'affichage reflète toujours l'état interne.
+        function renderSearchRows() {
+            const container = document.getElementById('searchRows');
+            container.innerHTML = '';
 
-            const label = (typeof label_bibliotheque === 'string') ? label_bibliotheque.trim() : '';
-            physicalOption.textContent = label ? `Physique (${label})` : 'Physique';
+            searchRows.forEach((row, index) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'primo-search-row';
+
+                if (index === 0) {
+                    // La première ligne n'a pas d'opérateur booléen affiché.
+                    // On place donc un simple espace vide de même largeur
+                    // pour conserver l'alignement visuel avec les lignes suivantes.
+                    const spacerGroup = document.createElement('div');
+                    spacerGroup.className = 'primo-input-group spacer';
+                    rowDiv.appendChild(spacerGroup);
+                } else {
+                    // À partir de la deuxième ligne, on affiche le sélecteur booléen
+                    // qui permet de relier cette ligne à la précédente.
+                    const boolGroup = document.createElement('div');
+                    boolGroup.className = 'primo-input-group bool';
+                    const boolSelect = document.createElement('select');
+                    boolSelect.className = 'bool-operator';
+                    boolSelect.setAttribute('aria-label', `Opérateur booléen de la ligne ${index + 1}`);
+                    boolOperators.forEach(op => {
+                        const option = document.createElement('option');
+                        option.value = op.value;
+                        option.textContent = op.label;
+                        option.selected = row.boolOperator === op.value;
+                        boolSelect.appendChild(option);
+                    });
+                    // À chaque changement, on met à jour l'état interne,
+                    // sans rerender immédiat car le select existe déjà dans le DOM.
+                    boolSelect.addEventListener('change', (e) => {
+                        searchRows[index].boolOperator = e.target.value;
+                    });
+                    boolGroup.appendChild(boolSelect);
+                    rowDiv.appendChild(boolGroup);
+                }
+
+                // Sélecteur du champ interrogé (titre, auteur, sujet, etc.).
+                const categoryGroup = document.createElement('div');
+                categoryGroup.className = 'primo-input-group category';
+                const categorySelect = document.createElement('select');
+                categorySelect.setAttribute('aria-label', `Champ recherché de la ligne ${index + 1}`);
+                categories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.value;
+                    option.textContent = cat.label;
+                    option.selected = row.category === cat.value;
+                    categorySelect.appendChild(option);
+                });
+                categorySelect.addEventListener('change', (e) => {
+                    searchRows[index].category = e.target.value;
+                });
+                categoryGroup.appendChild(categorySelect);
+                rowDiv.appendChild(categoryGroup);
+
+                // Sélecteur du type de correspondance textuelle.
+                // Exemple : contient / exact / commence par.
+                const operatorGroup = document.createElement('div');
+                operatorGroup.className = 'primo-input-group operator';
+                const operatorSelect = document.createElement('select');
+                operatorSelect.setAttribute('aria-label', `Type de correspondance de la ligne ${index + 1}`);
+                operators.forEach(op => {
+                    const option = document.createElement('option');
+                    option.value = op.value;
+                    option.textContent = op.label;
+                    option.selected = row.operator === op.value;
+                    operatorSelect.appendChild(option);
+                });
+                operatorSelect.addEventListener('change', (e) => {
+                    searchRows[index].operator = e.target.value;
+                });
+                operatorGroup.appendChild(operatorSelect);
+                rowDiv.appendChild(operatorGroup);
+
+                // Champ texte de la requête saisie par l'usager.
+                // À chaque frappe, on synchronise l'objet correspondant dans le tableau searchRows.
+                const queryGroup = document.createElement('div');
+                queryGroup.className = 'primo-input-group query';
+                const queryInput = document.createElement('input');
+                queryInput.type = 'text';
+                queryInput.placeholder = 'Saisir un terme de recherche';
+                queryInput.setAttribute('aria-label', `Terme de recherche de la ligne ${index + 1}`);
+                queryInput.value = row.query;
+                queryInput.addEventListener('input', (e) => {
+                    searchRows[index].query = e.target.value;
+                });
+                queryGroup.appendChild(queryInput);
+                rowDiv.appendChild(queryGroup);
+
+                container.appendChild(rowDiv);
+            });
+
+            const addBtn = document.getElementById('addRowBtn');
+            // On masque le bouton d'ajout à partir de 7 lignes,
+            // conformément à la règle métier définie au début du fichier.
+            if (searchRows.length >= max_rows) {
+                addBtn.style.display = 'none';
+            } else {
+                addBtn.style.display = 'flex';
+            }
+        }
+        
+        // Initialise le formulaire avec 2 lignes vides,
+        // ce qui correspond au comportement attendu au chargement.
+        function initializeForm() {
+            searchRows = [createSearchRow(0), createSearchRow(1)];
+            renderSearchRows();
         }
 
+        // Ajout d'une ligne supplémentaire jusqu'à un maximum de 7.
+        // Après modification du tableau d'état, on relance le rendu complet.
+        document.getElementById('addRowBtn').addEventListener('click', () => {
+            if (searchRows.length < max_rows) {
+                searchRows.push(createSearchRow(searchRows.length));
+                renderSearchRows();
+                const newRowNumber = searchRows.length;
+                document.getElementById('primoFormStatus').textContent = `Ligne de recherche ${newRowNumber} ajoutée`;
+                const rows = document.querySelectorAll('#searchRows .primo-search-row');
+                const lastRow = rows[rows.length - 1];
+                if (lastRow) {
+                    const firstFocusable = lastRow.querySelector('select, input');
+                    if (firstFocusable) firstFocusable.focus();
+                }
+            }
+        });
+
+        // Réinitialisation complète du formulaire.
+        // On remet :
+        // - 2 lignes de recherche vides
+        // - le support sur "physique"
+        // - tous les filtres sur leur valeur par défaut
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            searchRows = [createSearchRow(0), createSearchRow(1)];
+            renderSearchRows();
+            document.getElementById('support').value = 'physical';
+            document.getElementById('materialType').value = 'all_items';
+            document.getElementById('language').value = 'all_items';
+            document.getElementById('publicationDate').value = 'all_items';
+            document.getElementById('primoFormStatus').textContent = 'Formulaire et filtres réinitialisés';
+        });
+
+        // Gestion de la soumission du formulaire.
+        // Au lieu d'envoyer un formulaire HTML classique,
+        // on empêche l'envoi natif pour construire manuellement l'URL Primo.
+        document.getElementById('primo-standalone-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Vérification minimale : il faut au moins un terme saisi dans une des lignes de recherche.
+            const hasQuery = searchRows.some(row => row.query.trim() !== '');
+            if (!hasQuery) {
+                alert('Veuillez saisir au moins un terme de recherche.');
+                return;
+            }
+            
+            // Le * seul ne permet pas de rechercher tous les documents contrairement à d'autres outils
+            const hasOnlyWildcard = searchRows.some(row => row.query.trim() === '*');
+            if (hasOnlyWildcard) {
+                alert("Le caractère * ne permet pas de faire une recherche générale de tous les documents. Vous ne pouvez l'utiliser qu'en troncature à la fin d'un mot.");
+            return;}
+
+            const url = new URL(baseUrl);
+
+            // Primo rattache l'opérateur booléen affiché sur une ligne à la liaison
+            // avec la ligne précédente. On construit donc la requête à partir des
+            // seules lignes remplies, puis on porte le booléen de la ligne suivante
+            // sur la ligne courante.
+            const filledRows = searchRows.filter(row => row.query.trim() !== '');
+            filledRows.forEach((row, index) => {
+                const boolOp = index < filledRows.length - 1
+                    ? filledRows[index + 1].boolOperator
+                    : 'AND';
+                const queryStr = `${row.category},${row.operator},${row.query},${boolOp}`;
+                url.searchParams.append('query', queryStr);
+            });
+
+            // Filtre de support.
+            // - online => ressources en ligne
+            // - sinon => limitation à la bibliothèque de Draguignan
+            const support = document.getElementById('support').value;
+            if (support === 'online') {
+                url.searchParams.append('facet', 'tlevel,include,online_resources');
+            } else if (support === 'physical' || support === 'all_libraries') {
+                url.searchParams.append('facet', 'library,include,' + code_bibliotheque);
+            }
+
+            // On utilise mfacet et non pfilter prévu dans le formulaire avancé par défaut
+            // pour rendre la facette visible dans la page de résultats.
+            // Cas particulier : "articles" correspond en réalité à deux types Primo,
+            // donc on ajoute deux paramètres mfacet distincts.
+            const materialType = document.getElementById('materialType').value;
+            if (materialType !== 'all_items') {
+                if (materialType === 'articles') {
+                    url.searchParams.append('mfacet', 'rtype,include,articles,1')
+                    url.searchParams.append('mfacet', 'rtype,include,magazinearticle,1')
+                }
+                else {
+                    url.searchParams.append('facet', `rtype,include,${materialType}`);
+                }
+            }
+
+            const language = document.getElementById('language').value;
+            if (language !== 'all_items') {
+            // Contrairement au formulaire de recherche avancée standard on utilise facet et non pfilter afin que la facette reste visible dans l'interface de résultats Primo.
+                url.searchParams.append('facet', `lang,include,${language}`);
+            }
+
+            const pubDate = document.getElementById('publicationDate').value;
+            if (pubDate !== 'all_items') {
+            // Contrairement au formulaire de recherche avancée standard on calcule dynamiquement une plage d'années à partir de l'année courante.
+            // Le format attendu par Primo est :
+            // searchcreationdate,include,annéeDébut|,|annéeFin    
+                const currentYear = new Date().getFullYear();
+                let startYear;
+                let endYear;
+
+                switch (pubDate) {
+                    case 'current_year':
+                        startYear = currentYear;
+                        endYear = currentYear;
+                        break;
+
+                    case 'previous_year':
+                        startYear = currentYear - 1;
+                        endYear = currentYear;
+                        break;
+
+                    case 'last_5_years':
+                        startYear = currentYear - 5;
+                        endYear = currentYear;
+                        break;
+
+                    case 'last_10_years':
+                        startYear = currentYear - 10;
+                        endYear = currentYear;
+                        break;
+                }
+
+                url.searchParams.append(
+                    'facet',
+                    `searchcreationdate,include,${startYear}|,|${endYear}`
+                );
+            }
+
+            // Ajout final des paramètres Primo communs à toutes les recherches.
+            Object.entries(defaultParams).forEach(([key, value]) => {
+                url.searchParams.append(key, value);
+            });
+
+            window.open(url.toString(), '_blank');
+        });
+
+        // Quand le support change, on ajuste immédiatement les types de document disponibles.
+        document.getElementById('support').addEventListener('change', updateMaterialTypes);
+
+        // Initialisation au chargement de la page.
+        // 1) on crée les deux premières lignes
+        // 2) on applique la logique de compatibilité des types de documents
         initializeForm();
         updateMaterialTypes();
-        updateSupportLabel();
+
     </script>
 </body>
 </html>
