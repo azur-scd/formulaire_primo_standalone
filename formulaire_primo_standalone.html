@@ -43,11 +43,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulaire Primo déporté, pour intégration au site DiBSO ou externe</title>
     <style>
-
+        :root {
+          --couleur-principale : #333;
+          --couleur-bordure-bas :  #ddd;
+          --couleur-box-shadow : #1565c0;
+          --couleur-placeholder : #999;
+          --couleur-survol-bouton : #f0f0f0;
+          --couleur-bouton-label : #666;
+          --couleur-bouton-annulation : #666;
+          --couleur-survol-bouton-recherche : #0d47a1;
+          --couleur-divider : #e0e0e0;
+          --couleur-resultats : #f9f9f9;
+        }
+        /* ombre noire très légère */
         #primo-standalone-form {
             max-width: 1200px;
             margin: 0 auto;
-            background: white;
             border-radius: 4px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
@@ -58,9 +69,9 @@
 
         #primo-standalone-form .primo-search-criteria legend,  #primo-standalone-form .primo-search-filters legend  {
             font-size: 16px;
-            font-weight: 500;
+            font-weight: normal;
             margin-bottom: 16px;
-            color: #333;
+            color: var(--couleur-principale);
         } 
 
         #primo-standalone-form .primo-search-row {
@@ -101,7 +112,7 @@
             padding-bottom: 8px;
             padding-left: 8px;
             border: none;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--bordure-bas);
             font-size: 14px;
             background: transparent;
             width: 100%;
@@ -110,21 +121,21 @@
 
         #primo-standalone-form select:focus, #primo-standalone-form input[type="text"]:focus {
             outline: none;
-            box-shadow: inset 0 0 0 2px #1565c0;
+            box-shadow: inset 0 0 0 2px var(--couleur-box-shadow);
             
         }
 
         #primo-standalone-form button:focus-visible {
-            outline: 2px solid #1565c0;
+            outline: 2px solid var(--couleur-box-shadow);
             outline-offset: 2px;
         }
         #primo-standalone-form input[type="text"]::placeholder {
-            color: #999;
+            color: var(--couleur-placeholder);
         }
 
         #primo-standalone-form .bool-operator {
             font-size: 12px;
-            font-weight: 700;
+            font-weight: bold;
             text-transform: uppercase;
         }
 
@@ -149,32 +160,32 @@
 
         #primo-standalone-form .primo-btn-add {
             background-color: transparent;
-            color: #1565c0;
+            color: var(--couleur-box-shadow);
         }
 
         #primo-standalone-form .primo-btn-add:hover {
-            background-color: #f0f0f0;
+            background-color: var(--couleur-survol-bouton);
         }
 
         #primo-standalone-form .primo-btn-clear {
             background-color: transparent;
-            color: #666;
+            color: var(--couleur-bouton-annulation);
         }
 
         #primo-standalone-form .primo-btn-clear:hover {
-            background-color: #f0f0f0;
+            background-color: var(--couleur-survol-bouton);
         }
 
         #primo-standalone-form .primo-btn-search {
-            background-color: #1565c0;
+            background-color: var(--couleur-box-shadow);
             color: white;
-            font-weight: 500;
+            font-weight: normal;
             padding: 12px 24px;
             font-size: 15px;
         }
 
         #primo-standalone-form .primo-btn-search:hover {
-            background-color: #0d47a1;
+            background-color: var(--couleur-survol-bouton-recherche);
         }
 
         #primo-standalone-form .primo-form {
@@ -198,20 +209,20 @@
         #primo-standalone-form .primo-filter-group label {
             display: block;
             font-size: 12px;
-            color: #666;
+            color: var(--couleur-label);
             margin-bottom: 4px;
         }
 
         #primo-standalone-form .primo-divider {
             height: 1px;
-            background-color: #e0e0e0;
+            background-color: var(--couleur-divider);
             margin: 20px 0;
         }
 
         #primo-standalone-form .primo-search-output {
             margin-top: 24px;
             padding: 16px;
-            background-color: #f9f9f9;
+            background-color: var(--couleur-resultats);
             border-radius: 4px;
         }
 
