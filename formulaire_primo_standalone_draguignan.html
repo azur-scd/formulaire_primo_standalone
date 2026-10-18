@@ -364,6 +364,7 @@
 
     <script>
         const baseUrl = 'https://catalogue.bu.univ-cotedazur.fr/primo-explore/search';
+        const max_rows = 7;
         const code_bibliotheque = '';
         const label_bibliotheque = '';
         const recherche_reseau = false;
@@ -413,7 +414,6 @@
         // Le rendu HTML est régénéré à partir de ce tableau.
         let searchRows = [];
 
-        
         // Cette fonction adapte la liste des types de document au support choisi.
         // Si l'on recherche uniquement des contenus en ligne les types purement physiques (vidéos, CD, affiches) sont non sélectionnables.
         // À l'inverse, le type "articles" n'est sélectionnable que si on cherche des contenus en ligne.
@@ -563,7 +563,7 @@
             const addBtn = document.getElementById('addRowBtn');
             // On masque le bouton d'ajout à partir de 7 lignes,
             // conformément à la règle métier définie au début du fichier.
-            if (searchRows.length >= 7) {
+            if (searchRows.length >= max_rows) {
                 addBtn.style.display = 'none';
             } else {
                 addBtn.style.display = 'flex';
@@ -580,7 +580,7 @@
         // Ajout d'une ligne supplémentaire jusqu'à un maximum de 7.
         // Après modification du tableau d'état, on relance le rendu complet.
         document.getElementById('addRowBtn').addEventListener('click', () => {
-            if (searchRows.length < 7) {
+            if (searchRows.length < max_rows) {
                 searchRows.push(createSearchRow(searchRows.length));
                 renderSearchRows();
                 const newRowNumber = searchRows.length;
