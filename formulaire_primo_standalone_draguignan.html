@@ -650,7 +650,7 @@
             if (support === 'online') {
                 url.searchParams.append('facet', 'tlevel,include,online_resources');
             } else if (support === 'physical' || support === 'all_libraries') {
-                url.searchParams.append('facet', 'library,include' + code_bibliotheque);
+                url.searchParams.append('facet', 'library,include,' + code_bibliotheque);
             }
 
             // On utilise mfacet et non pfilter prévu dans le formulaire avancé par défaut
