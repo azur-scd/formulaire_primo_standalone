@@ -71,6 +71,9 @@ Points d’attention pour l’intégration
     const toutes_bibliotheques = true;
     // 4. Nom accessible du formulaire, annoncé par les lecteurs d'écran (à rendre unique dans la page qui intègre le formulaire)
     const label_formulaire = 'Recherche avancée dans le catalogue';
+    // 5. Types de documents à afficher dans le formulaire
+    const types_de_documents = ["journal", "articles", "conference_proceedings", "dissertations", "videos", "audios", "images", "games"]
+    
     // Paramètres communs
     // URL de base de Primo UniCA
     const baseUrl = 'https://catalogue.bu.univ-cotedazur.fr/primo-explore/search';
@@ -415,8 +418,8 @@ Points d’attention pour l’intégration
                         </select>
                     </div>
                     <div class="primo-filter-group">
-                        <label for="materialType">Type de document</label>
-                        <select id="materialType" name="materialType">
+                        <label for="documentType">Type de document</label>
+                        <select id="documentType" name="documentType">
                             <option value="all_items" selected>Tous types</option>
                             <option value="books">Livres</option>
                             <option value="journals">Revues</option>                            
@@ -519,7 +522,7 @@ Points d’attention pour l’intégration
     const form = $('primo-standalone-form');
     form.setAttribute('aria-label', label_formulaire);
     const supportSelect = $('support');
-    const materialTypeSelect = $('materialType');
+    const documentTypeSelect = $('documentType');
     const languageSelect = $('language');
     const publicationDateSelect = $('publicationDate');
 	const customYearField = $('customYearField');
@@ -710,41 +713,53 @@ Points d’attention pour l’intégration
         renderSearchRows();
     }
 
+    // masque certains types de documents en fonction de la variable de configuration types_de_documents
+    function updateDocumentTypes() {
+        const documentTypeOptions = documentTypeSelect.querySelectorAll('option');
+        documentTypeOptions.forEach(option => {
+            if ((option.value !== "all_items") & (!types_de_documents.includes(option.value))) {
+                option.remove();
+            }
+        });
+    }
+
     // Cette fonction adapte la liste des types de document au support choisi.
     // Si l'on recherche uniquement des contenus en ligne les types purement physiques (vidéos, CD, affiches) sont non sélectionnables.
     // À l'inverse, le type "articles" n'est sélectionnable que si on cherche des contenus en ligne.
-    function updateMaterialTypes() {
+    function updatedocumentTypes() {
         const support = supportSelect.value;
         const isPhysical = support === 'library' || support === 'all_libraries';
 
         const options = {
-            videos: materialTypeSelect.querySelector('option[value="videos"]'),
-            audios: materialTypeSelect.querySelector('option[value="audios"]'),
-            images: materialTypeSelect.querySelector('option[value="images"]'),
-            games: materialTypeSelect.querySelector('option[value="games"]'),
-            articles: materialTypeSelect.querySelector('option[value="articles"]'),
-            conference_proceedings : materialTypeSelect.querySelector('option[value="conference_proceedings"]')
+            videos: documentTypeSelect.querySelector('option[value="videos"]'),
+            audios: documentTypeSelect.querySelector('option[value="audios"]'),
+            images: documentTypeSelect.querySelector('option[value="images"]'),
+            games: documentTypeSelect.querySelector('option[value="games"]'),
+            articles: documentTypeSelect.querySelector('option[value="articles"]'),
+            conference_proceedings : documentTypeSelect.querySelector('option[value="conference_proceedings"]')
         };
 
-        options.videos.disabled = !isPhysical;
-        options.audios.disabled = !isPhysical;
-        options.images.disabled = !isPhysical;
-        options.games.disabled = !isPhysical;
-        options.articles.disabled = isPhysical;
-        options.conference_proceedings.disabled = isPhysical;
-        // La mention "(en ligne uniquement)" n'est affichée que lorsque l'option "Articles" n'est pas sélectionnable. Idem pour "Actes de conférence"
-        options.articles.textContent = isPhysical ? 'Articles (en ligne uniquement)' : 'Articles';
-        options.conference_proceedings.textContent = isPhysical ? 'Actes de conférence (en ligne uniquement)' : 'Actes de conférence';
-
+        if (options.videos !== null) { options.videos.disabled = !isPhysical; }
+        if (options.audios !== null) { options.audios.disabled = !isPhysical; }
+        if (options.images !== null) { options.images.disabled = !isPhysical; }
+        if (options.games !== null) { options.games.disabled = !isPhysical; }
+        if (options.articles !== null) {
+            options.articles.disabled = isPhysical;
+            options.articles.textContent = isPhysical ? 'Articles (en ligne uniquement)' : 'Articles';
+        }
+        if (options.conference_proceedings !== null) {
+            options.conference_proceedings.disabled = isPhysical;
+            options.conference_proceedings.textContent = isPhysical ? 'Actes de conférence (en ligne uniquement)' : 'Actes de conférence';
+         }
         if (support === 'all_libraries') {
-            materialTypeSelect.value = 'all_items';
+            documentTypeSelect.value = 'all_items';
             return;
         }
 
         // Si l'utilisateur avait sélectionné une option désormais interdite on revient à "Tous types" pour éviter de de conserver un état incohérent dans le formulaire.
-        const selected = materialTypeSelect.querySelector(`option[value="${materialTypeSelect.value}"]`);
+        const selected = documentTypeSelect.querySelector(`option[value="${documentTypeSelect.value}"]`);
         if (selected && selected.disabled) {
-            materialTypeSelect.value = 'all_items';
+            documentTypeSelect.value = 'all_items';
         }
     }
 
@@ -774,7 +789,7 @@ Points d’attention pour l’intégration
         if (supportSelect.selectedIndex < 0) {
             supportSelect.selectedIndex = 0;
         }
-        updateMaterialTypes();
+        updatedocumentTypes();
     }
 
 
@@ -802,7 +817,7 @@ Points d’attention pour l’intégration
         clearError();
         initializeForm();
         supportSelect.selectedIndex = 0;
-        materialTypeSelect.value = 'all_items';
+        documentTypeSelect.value = 'all_items';
         languageSelect.value = 'all_items';
         publicationDateSelect.value = 'all_items';
         startYearInput.value = '';
@@ -813,16 +828,16 @@ Points d’attention pour l’intégration
         YearInput.value = '';
         customYearField.hidden = true;
         updateLibrarySupport();
-        updateMaterialTypes();
+        updatedocumentTypes();
         announce('Formulaire et filtres réinitialisés');
     });
 
     // Quand le support change, on ajuste immédiatement les types de document disponibles et on met à jour le libellé de l'option "Physique" si nécessaire.
     supportSelect.addEventListener('change', () => {
-        const previousType = materialTypeSelect.value;
-        updateMaterialTypes();
+        const previousType = documentTypeSelect.value;
+        updatedocumentTypes();
         updateLibrarySupport();
-        if (previousType !== 'all_items' && materialTypeSelect.value === 'all_items') {
+        if (previousType !== 'all_items' && documentTypeSelect.value === 'all_items') {
             announce('Support modifié : le type de document est remis sur « Tous types »');
         } else {
             announce('Support modifié : types de document disponibles mis à jour');
@@ -881,12 +896,12 @@ Points d’attention pour l’intégration
         // pour rendre la facette visible dans la page de résultats.
         // Cas particulier : "articles" correspond en réalité à deux types Primo,
         // donc on ajoute deux paramètres mfacet distincts.
-        const materialType = materialTypeSelect.value;
-        if (materialType === 'articles') {
+        const documentType = documentTypeSelect.value;
+        if (documentType === 'articles') {
             url.searchParams.append('mfacet', 'rtype,include,articles,1');
             url.searchParams.append('mfacet', 'rtype,include,magazinearticle,1');
-        } else if (materialType !== 'all_items') {
-            url.searchParams.append('facet', `rtype,include,${materialType}`);
+        } else if (documentType !== 'all_items') {
+            url.searchParams.append('facet', `rtype,include,${documentType}`);
         }
 
         const language = languageSelect.value;
@@ -984,8 +999,9 @@ Points d’attention pour l’intégration
     // 3) on met à jour le libellé de l'option "Physique" si une bibliothèque est définie dans le code, on masque l'option "Physique" si aucune bibliothèque n'est définie dans le code
     // 4) on met à jour les champs années personnalisées
     // 5) on écoute les évenements entrainant une modification des champs années personnalisés
-    initializeForm();    
-    updateMaterialTypes();
+    initializeForm();
+    updateDocumentTypes();
+    updatedocumentTypes();
     updateLibrarySupport();
     updatePublicationDateFieldVisibility();
     setupPublicationDateFilter();
