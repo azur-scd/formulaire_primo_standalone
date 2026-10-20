@@ -1,6 +1,6 @@
 <!--
 Formulaire de recherche avancée déporté pour Primo BO adapté aux spécificités UniCA
-Version 1.3, 20/10/2026
+Version 1.4, 20/10/2026
 
 Ce formulaire utilise la technique du Shadow DOM : son HTML et son CSS sont isolés dans un "shadow root" rattaché à l'élément #primo-form-host, ce qui évite tout conflit de styles avec la page qui l'intègre.
 Pour cette raison, le JS cherche les éléments dans ce shadow root (root.getElementById, root.querySelector) et non dans document.
@@ -955,23 +955,33 @@ Points d’attention pour l’intégration
         window.open(url.toString(), '_blank');
     });
 
-    // Initialisation au chargement de la page.
-    // 1) on crée les deux premières lignes
-    // 2) on applique la logique de compatibilité des types de documents
-    // 3) on met à jour le libellé de l'option "Physique" si une bibliothèque est définie dans le code, on masque l'option "Physique" si aucune bibliothèque n'est définie dans le code
-    initializeForm();
-    // Affiche les champs uniquement pour l'année ou les années personnalisées.
-    publicationDateSelect.addEventListener('change', () => {
+    function updatePublicationDateFieldVisibility() {
         const isCustomYears = publicationDateSelect.value === 'custom_years';
         const isCustomYear = publicationDateSelect.value === 'custom_year';
         customYearsFields.hidden = !isCustomYears;
         customYearField.hidden = !isCustomYear;
-    });
-    startYearInput.addEventListener('focus', showYearsPlaceholders);
-    endYearInput.addEventListener('focus', showYearsPlaceholders);
-    startYearInput.addEventListener('blur', resetYearsPlaceholders);
-    endYearInput.addEventListener('blur', resetYearsPlaceholders);
+    }
+
+    function setupPublicationDateFilter() {
+        publicationDateSelect.addEventListener('change', updatePublicationDateFieldVisibility);
+        startYearInput.addEventListener('focus', showYearsPlaceholders);
+        endYearInput.addEventListener('focus', showYearsPlaceholders);
+        startYearInput.addEventListener('blur', resetYearsPlaceholders);
+        endYearInput.addEventListener('blur', resetYearsPlaceholders);
+    }
+
+    // Initialisation au chargement de la page.
+    // 1) on crée les deux premières lignes
+    // 2) on applique la logique de compatibilité des types de documents
+    // 3) on met à jour le libellé de l'option "Physique" si une bibliothèque est définie dans le code, on masque l'option "Physique" si aucune bibliothèque n'est définie dans le code
+    // 4) on met à jour les champs années personnalisées
+    // 5) on écoute les évenements entrainant une modification des champs années personnalisés
+    initializeForm();    
     updateMaterialTypes();
     updateLibrarySupport();
+    updatePublicationDateFieldVisibility();
+    setupPublicationDateFilter();
 })();
 </script>
+
+
