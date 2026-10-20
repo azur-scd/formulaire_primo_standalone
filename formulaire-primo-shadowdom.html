@@ -419,12 +419,13 @@ Points d’attention pour l’intégration
                         <select id="materialType" name="materialType">
                             <option value="all_items" selected>Tous types</option>
                             <option value="books">Livres</option>
-                            <option value="journals">Revues</option>
-                            <option value="dissertations">Thèses / mémoires</option>                            
+                            <option value="journals">Revues</option>                            
+                            <option value="articles">Articles (en ligne uniquement)</option>
+                            <option value="dissertations">Thèses / mémoires</option>
                             <option value="videos">Vidéos</option>
                             <option value="audios">CD</option>
                             <option value="images">Affiches</option>
-                            <option value="articles">Articles (en ligne uniquement)</option>
+                            <option value="games">Jeux</option>                            
                         </select>
                     </div>
                     <div class="primo-filter-group">
@@ -719,12 +720,15 @@ Points d’attention pour l’intégration
             videos: materialTypeSelect.querySelector('option[value="videos"]'),
             audios: materialTypeSelect.querySelector('option[value="audios"]'),
             images: materialTypeSelect.querySelector('option[value="images"]'),
+            games: materialTypeSelect.querySelector('option[value="games"]'),
             articles: materialTypeSelect.querySelector('option[value="articles"]')
+
         };
 
         options.videos.disabled = !isPhysical;
         options.audios.disabled = !isPhysical;
         options.images.disabled = !isPhysical;
+        options.games.disabled = !isPhysical;
         options.articles.disabled = isPhysical;
         // La mention "(en ligne uniquement)" n'est affichée que lorsque l'option "Articles" n'est pas sélectionnable
         options.articles.textContent = isPhysical ? 'Articles (en ligne uniquement)' : 'Articles';
