@@ -1,48 +1,56 @@
 <!DOCTYPE html>
 <html lang="fr">
 
-<!-- Formulaire de recherche avancée déporté pour Primo BO adapté aux spécificités UniCA -->
-<!-- Version 1.0, 19/10/2026-->
-<!-- Personnalisable en modifiant ces variables à partir de la ligne 400 : -->
-<!--   const code_bibliotheque = ''; -->
-<!--   const label_bibliotheque = ''; -->
-<!--   const toutes_bibliotheques = true;-->
-<!-- Génération dynamique de 2 à 7 lignes de recherche. -->
-<!-- Champs disponibles : -->
-<!-- > Tous les champs -->
-<!-- > Titre -->
-<!-- > Auteur/créateur -->
-<!-- > Sujet -->
-<!-- > Éditeur (lsr01) -->
-<!-- > Collection (lsr02) -->
-<!-- > ISBN/ISSN/EAN/PPN/NNT/DOI (lsr03) -->
-<!-- > Date de publication (searchcreationdate) -->
-<!-- > Cote et code-barre (lsr07) -->
-<!-- Opérateurs : -->
-<!-- > contient -->
-<!-- > est égal à -->
-<!-- > commence par -->
-<!-- Opérateurs booléens : -->
-<!-- > ET (AND) -->
-<!-- > OU (OR) -->
-<!-- > SAUF (NOT) -->
-<!-- Filtres latéraux : -->
-<!-- > Support -->
-<!-- > Type de document -->
-<!-- > Langue -->
-<!-- > Date de publication -->
-<!-- Pour le support : -->
-<!-- > Physique (une bibliothèque) ⇒ facet=library,include,code_bibliotheque -->
-<!-- > Physique (toutes les bibliothèques) ⇒ facet=tlevel,include,available -->
-<!-- > En ligne ⇒ facet=tlevel,include,online_resources -->
-<!-- Paramètres Primo par défaut : -->
-<!-- > tab=default_tab -->
-<!-- > search_scope=all -->
-<!-- > vid=UCA -->
-<!-- > lang=fr_FR -->
-<!-- > mode=advanced -->
-<!-- > offset=0 -->
-<!-- La recherche ouvre le résultat dans un nouvel onglet (window.open(..., '_blank')). -->
+<!--
+Formulaire de recherche avancée déporté pour Primo BO adapté aux spécificités UniCA
+Version 1.1, 20/10/2026
+Personnalisable en modifiant ces variables à partir de la ligne 400 :
+  const code_bibliotheque = '';
+  const label_bibliotheque = '';
+  const toutes_bibliotheques = true;
+Génération dynamique de 2 à 7 lignes de recherche.
+Champs disponibles :
+> Tous les champs
+> Titre
+> Auteur/créateur
+> Sujet
+> Éditeur (lsr01)
+> Collection (lsr02)
+> ISBN/ISSN/EAN/PPN/NNT/DOI (lsr03)
+> Date de publication (searchcreationdate)
+> Cote et code-barre (lsr07)
+Opérateurs :
+> contient
+> est égal à
+> commence par
+Opérateurs booléens :
+> ET (AND)
+> OU (OR)
+> SAUF (NOT)
+Filtres latéraux :
+> Support
+> Type de document
+> Langue
+> Date de publication
+Pour le support :
+> Physique (une bibliothèque) ⇒ facet=library,include,code_bibliotheque
+> Physique (toutes les bibliothèques) ⇒ facet=tlevel,include,available
+> En ligne ⇒ facet=tlevel,include,online_resources
+Paramètres Primo par défaut :
+> tab=default_tab
+> search_scope=all
+> vid=UCA
+> lang=fr_FR
+> mode=advanced
+> offset=0
+La recherche ouvre le résultat dans un nouvel onglet (window.open(..., '_blank')).
+
+Points d’attention pour l’intégration
+> Tout le code est enveloppé dans un élément html (head contenant le style ; body). L'intégration directe du code dans une page cible n'est pas conforme au standard html, même si les navigateurs acceptent en pratique ce mécanisme. Il serait plus propre d'adopter une iframe, un webcomponent, ou d'intégrer le stylage css dans le head de la page hote)
+> Les polices de la page hôte sont héritées (font-family: inherit), mais ses autres styles (couleurs, box-sizing, etc.) ne s’appliquent pas au formulaire. Si le rendu est un peu différent, ajoute les règles qui manquent dans le bloc <style> du template.
+> Pour intégrer plusieurs formulaires sur la même page, il faudra changer l’id primo-form-host pour chacun.
+> Penser à tester le comportement du window.open dans le CMS cible, certains bloquent les pop-ups tant que l’ouverture ne découle pas directement d’un clic, ce qui est bien le cas ici.
+-->
 
 <head>
     <meta charset="UTF-8">
@@ -126,7 +134,7 @@
             padding-bottom: 8px;
             padding-left: 8px;
             border: none;
-            border-bottom: 1px solid var(--bordure-bas);
+            border-bottom: 1px solid var(--couleur-bordure-bas);
             font-size: 14px;
             background: transparent;
             width: 100%;
@@ -309,7 +317,8 @@
             <div class="primo-form-left">
                 <!-- texte d'aide décrivant le fonctionnement des lignes de recherche, visible avec technologies d'assistance -->
                 <p id="primoFormLeftSearchHelp" class="sr-only">
-                    Pour chaque ligne, choisissez au moins un champ à rechercher, un type de correspondance, puis saisissez un terme de recherche. À partir de la deuxième ligne, vous pouvez choisir un opérateur booléen (ET, OU, SAUF) pour combiner les critères.                </p>
+                    Pour chaque ligne, choisissez au moins un champ à rechercher, un type de correspondance, puis saisissez un terme de recherche. À partir de la deuxième ligne, vous pouvez choisir un opérateur booléen (ET, OU, SAUF) pour combiner les critères.
+                </p>
                 <!-- zone d'annonce pour les changements dynamiques, visible avec technologies d'assistance -->
                 <div id="primoFormStatus" aria-live="polite" class="sr-only"></div>
                 <fieldset class="primo-search-criteria" aria-describedby="primoFormLeftSearchHelp">
@@ -434,7 +443,7 @@
             { value: 'cdate', label: 'Date de publication' },
             { value: 'lsr07', label: 'Cote et code-barre' }
         ];
-        // Liste des opérateurs de recherche proposés à l'usager.
+        // Liste des opérateurs de correspondance textuelle proposés à l'usager.
         // L'opérateur "Commence par" ne fonctionne qu'avec certains index. 
         // Chaque "value" correspond au code attendu par l'URL Primo, chaque "label" correspond au texte affiché à l'écran.
         const operators = [
@@ -465,11 +474,6 @@
             const physical = support === 'physical' || support === 'all_libraries';
             const all_libraries = support === 'all_libraries';
 
-            if (all_libraries) {
-                materialType.value = 'all_items';
-                return;
-            }
-
             const videosOption = materialType.querySelector('option[value="videos"]');
             const audiosOption = materialType.querySelector('option[value="audios"]');
             const imagesOption = materialType.querySelector('option[value="images"]');
@@ -479,6 +483,11 @@
             audiosOption.disabled = !physical;
             imagesOption.disabled = !physical;
             articlesOption.disabled = physical;
+
+            if (all_libraries) {
+                materialType.value = 'all_items';
+                return;
+            }
 
             const disabledValues = [];
 
@@ -527,7 +536,7 @@
                 query: ''
             };
         }
- 
+
         // Fonction centrale de rendu des lignes de recherche.
         // Elle vide le conteneur HTML puis reconstruit toutes les lignes à partir du tableau searchRows.
         // Cette approche garantit que l'affichage reflète toujours l'état interne.
@@ -671,6 +680,8 @@
             document.getElementById('materialType').value = 'all_items';
             document.getElementById('language').value = 'all_items';
             document.getElementById('publicationDate').value = 'all_items';
+            updatePhysicalSupport();
+            updateMaterialTypes();
             document.getElementById('primoFormStatus').textContent = 'Formulaire et filtres réinitialisés';
         });
 
@@ -712,15 +723,11 @@
             // - physical => limitation à une bibliothèque physique donnée
             // - all_libraries => limitations à tous les documents physiquement disponibles dans le réseau
             const support = document.getElementById('support').value;
-            console.log (support);
             if (support === 'online') {
                 url.searchParams.append('facet', 'tlevel,include,online_resources');
             } else if (support === 'physical') {
-                console.log ('Recherche sur la bibliothèque physique');
                 url.searchParams.append('facet', 'library,include,' + code_bibliotheque);
             } else if (support === 'all_libraries') {
-                console.log ('Recherche sur toutes les bibliothèques physiques du réseau');
-
                 url.searchParams.append('facet', 'tlevel,include,available');
             }
 
@@ -792,131 +799,6 @@
 
         // Quand le support change, on ajuste immédiatement les types de document disponibles et on met à jour le libellé de l'option "Physique" si nécessaire.
         document.getElementById('support').addEventListener('change', () => { updateMaterialTypes(); updatePhysicalSupport(); });
-
-
-        // Fabrique l'objet JavaScript représentant une ligne de recherche.
-        // L'index n'est pas utilisé directement ici pour construire l'objet, mais il est passé pour cohérence avec l'appelant et une éventuelle évolution.
-        function createSearchRow(index) {
-            return {
-                boolOperator: 'AND',
-                category: 'any',
-                operator: 'contains',
-                query: ''
-            };
-        }
- 
-        // Fonction centrale de rendu des lignes de recherche.
-        // Elle vide le conteneur HTML puis reconstruit toutes les lignes à partir du tableau searchRows.
-        // Cette approche garantit que l'affichage reflète toujours l'état interne.
-        function renderSearchRows() {
-            const container = document.getElementById('searchRows');
-            container.innerHTML = '';
-
-            searchRows.forEach((row, index) => {
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'primo-search-row';
-
-                if (index === 0) {
-                    // La première ligne n'a pas d'opérateur booléen affiché.
-                    // On place donc un simple espace vide de même largeur
-                    // pour conserver l'alignement visuel avec les lignes suivantes.
-                    const spacerGroup = document.createElement('div');
-                    spacerGroup.className = 'primo-input-group spacer';
-                    rowDiv.appendChild(spacerGroup);
-                } else {
-                    // À partir de la deuxième ligne, on affiche le sélecteur booléen
-                    // qui permet de relier cette ligne à la précédente.
-                    const boolGroup = document.createElement('div');
-                    boolGroup.className = 'primo-input-group bool';
-                    const boolSelect = document.createElement('select');
-                    boolSelect.className = 'bool-operator';
-                    boolSelect.setAttribute('aria-label', `Opérateur booléen de la ligne ${index + 1}`);
-                    boolOperators.forEach(op => {
-                        const option = document.createElement('option');
-                        option.value = op.value;
-                        option.textContent = op.label;
-                        option.selected = row.boolOperator === op.value;
-                        boolSelect.appendChild(option);
-                    });
-                    // À chaque changement, on met à jour l'état interne,
-                    // sans rerender immédiat car le select existe déjà dans le DOM.
-                    boolSelect.addEventListener('change', (e) => {
-                        searchRows[index].boolOperator = e.target.value;
-                    });
-                    boolGroup.appendChild(boolSelect);
-                    rowDiv.appendChild(boolGroup);
-                }
-
-                // Sélecteur du champ interrogé (titre, auteur, sujet, etc.).
-                const categoryGroup = document.createElement('div');
-                categoryGroup.className = 'primo-input-group category';
-                const categorySelect = document.createElement('select');
-                categorySelect.setAttribute('aria-label', `Champ recherché de la ligne ${index + 1}`);
-                categories.forEach(cat => {
-                    const option = document.createElement('option');
-                    option.value = cat.value;
-                    option.textContent = cat.label;
-                    option.selected = row.category === cat.value;
-                    categorySelect.appendChild(option);
-                });
-                categorySelect.addEventListener('change', (e) => {
-                    searchRows[index].category = e.target.value;
-                });
-                categoryGroup.appendChild(categorySelect);
-                rowDiv.appendChild(categoryGroup);
-
-                // Sélecteur du type de correspondance textuelle.
-                // Exemple : contient / exact / commence par.
-                const operatorGroup = document.createElement('div');
-                operatorGroup.className = 'primo-input-group operator';
-                const operatorSelect = document.createElement('select');
-                operatorSelect.setAttribute('aria-label', `Type de correspondance de la ligne ${index + 1}`);
-                operators.forEach(op => {
-                    const option = document.createElement('option');
-                    option.value = op.value;
-                    option.textContent = op.label;
-                    option.selected = row.operator === op.value;
-                    operatorSelect.appendChild(option);
-                });
-                operatorSelect.addEventListener('change', (e) => {
-                    searchRows[index].operator = e.target.value;
-                });
-                operatorGroup.appendChild(operatorSelect);
-                rowDiv.appendChild(operatorGroup);
-
-                // Champ texte de la requête saisie par l'usager.
-                // À chaque frappe, on synchronise l'objet correspondant dans le tableau searchRows.
-                const queryGroup = document.createElement('div');
-                queryGroup.className = 'primo-input-group query';
-                const queryInput = document.createElement('input');
-                queryInput.type = 'text';
-                queryInput.placeholder = 'Saisir un terme de recherche';
-                queryInput.setAttribute('aria-label', `Terme de recherche de la ligne ${index + 1}`);
-                queryInput.value = row.query;
-                queryInput.addEventListener('input', (e) => {
-                    searchRows[index].query = e.target.value;
-                });
-                queryGroup.appendChild(queryInput);
-                rowDiv.appendChild(queryGroup);
-
-                container.appendChild(rowDiv);
-            });
-
-            const addBtn = document.getElementById('addRowBtn');
-            // On masque le bouton d'ajout à partir de 7 lignes,
-            // conformément à la règle métier définie au début du fichier.
-            if (searchRows.length >= max_rows) {
-                addBtn.style.display = 'none';
-            } else {
-                addBtn.style.display = 'flex';
-            }
-        }
-        
-        // Initialise le formulaire avec 2 lignes vides, ce qui correspond au comportement attendu au chargement.
-        function initializeForm() {
-            searchRows = [createSearchRow(0), createSearchRow(1)];
-            renderSearchRows();
-        }
 
         // Initialisation au chargement de la page.
         // 1) on crée les deux premières lignes
