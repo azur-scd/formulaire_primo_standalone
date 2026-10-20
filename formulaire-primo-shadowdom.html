@@ -421,6 +421,7 @@ Points d’attention pour l’intégration
                             <option value="books">Livres</option>
                             <option value="journals">Revues</option>                            
                             <option value="articles">Articles (en ligne uniquement)</option>
+                            <option value="conference_proceedings">Actes de conférence (en ligne uniquement)</option>
                             <option value="dissertations">Thèses / mémoires</option>
                             <option value="videos">Vidéos</option>
                             <option value="audios">CD</option>
@@ -721,8 +722,8 @@ Points d’attention pour l’intégration
             audios: materialTypeSelect.querySelector('option[value="audios"]'),
             images: materialTypeSelect.querySelector('option[value="images"]'),
             games: materialTypeSelect.querySelector('option[value="games"]'),
-            articles: materialTypeSelect.querySelector('option[value="articles"]')
-
+            articles: materialTypeSelect.querySelector('option[value="articles"]'),
+            conference_proceedings : materialTypeSelect.querySelector('option[value="conference_proceedings"]')
         };
 
         options.videos.disabled = !isPhysical;
@@ -730,8 +731,10 @@ Points d’attention pour l’intégration
         options.images.disabled = !isPhysical;
         options.games.disabled = !isPhysical;
         options.articles.disabled = isPhysical;
-        // La mention "(en ligne uniquement)" n'est affichée que lorsque l'option "Articles" n'est pas sélectionnable
+        options.conference_proceedings.disabled = isPhysical;
+        // La mention "(en ligne uniquement)" n'est affichée que lorsque l'option "Articles" n'est pas sélectionnable. Idem pour "Actes de conférence"
         options.articles.textContent = isPhysical ? 'Articles (en ligne uniquement)' : 'Articles';
+        options.conference_proceedings.textContent = isPhysical ? 'Actes de conférence (en ligne uniquement)' : 'Actes de conférence';
 
         if (support === 'all_libraries') {
             materialTypeSelect.value = 'all_items';
