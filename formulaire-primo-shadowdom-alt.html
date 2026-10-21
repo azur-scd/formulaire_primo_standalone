@@ -62,14 +62,22 @@ Points d’attention pour l’intégration
 > Les polices de la page hôte sont héritées (font-family: inherit), mais ses autres styles (couleurs, box-sizing, etc.) ne s’appliquent pas au formulaire. Si le rendu est un peu différent, ajoute les règles qui manquent dans le bloc <style> du template.
 > Pour intégrer plusieurs formulaires sur la même page, il faudra changer l’id primo-form-host pour chacun.
 > Penser à tester le comportement du window.open dans le CMS cible, certains bloquent les pop-ups tant que l’ouverture ne découle pas directement d’un clic, ce qui est bien le cas ici.
-> Pour tester la responsivité, intégrer l'ensemble du code dans une balise <body> précédée d'un <head><meta name="viewport" content="width=device-width, initial-scale=1"></head>, eux mêmes intégrés dans une balise <head>
+> Pour tester la responsivité le code est intégré dans une balise <html>, mais pour l'intégration seul le <div id=primo-form-host> et le <script> doivent être copiés
 
 -->
-
+<html>
 <head><meta name="viewport" content="width=device-width, initial-scale=1"></head>
 <body>
+<div><h1>Page de test pour intégration du formulaire Primo</h1>
+<p>Pour l'intégration effective, copier uniquement dans la page hôte :</p>
+<pre>
+<code>
+&lt;div id="primo-form-host"&gt; &lt;/div&gt; 
+&lt;script&gt; ....&lt;/script&gt;
+</code>
+</pre>
+</div>
 <div id="primo-form-host"></div>
-
 <script>
 (function () {
     // variables à modifier pour personnaliser le formulaire
@@ -1208,4 +1216,6 @@ Points d’attention pour l’intégration
 })();
 </script>
 
+<p>Suite de la page hôte</p>
 </body>
+</html>
