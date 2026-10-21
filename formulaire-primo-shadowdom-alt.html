@@ -89,9 +89,9 @@ Points d’attention pour l’intégration
     // 3. Recherche possible sur toutes les biblithèques physiques du résseau
     const toutes_bibliotheques = true;
     // 4. Nom accessible du formulaire, annoncé par les lecteurs d'écran (à rendre unique dans la page qui intègre le formulaire)
-    const label_formulaire = 'Recherche avancée dans le catalogue';
+    const label_formulaire = 'Recherche dans le catalogue';
     // 5. Types de documents à afficher dans le formulaire. Inutile d'indiquer "all_items"
-    const types_de_documents = ["journal", "articles", "conference_proceedings", "dissertations", "videos", "audios", "images", "games"]
+    const types_de_documents = ["books", "journals", "articles", "conference_proceedings", "dissertations", "videos", "audios", "images", "games"]
     
     // Paramètres communs
     // URL de base de Primo UniCA
@@ -925,7 +925,6 @@ Points d’attention pour l’intégration
     function updatedocumentTypes() {
         const support = supportSelect.value;
         const isPhysical = support === 'library' || support === 'all_libraries';
-
         const options = {
             videos: documentTypeSelect.querySelector('option[value="videos"]'),
             audios: documentTypeSelect.querySelector('option[value="audios"]'),
