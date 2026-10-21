@@ -1,6 +1,6 @@
 <!--
 Formulaire de recherche avancée déporté pour Primo BO adapté aux spécificités UniCA
-Version 1.7 (présentation alternative : Critères de recherche / Filtres empilés), 21/10/2026
+Version 1.9 (présentation alternative : Critères de recherche / Filtres empilés), 21/10/2026
 
 Ce formulaire utilise la technique du Shadow DOM : son HTML et son CSS sont isolés dans un "shadow root" rattaché à l'élément #primo-form-host, ce qui évite tout conflit de styles avec la page qui l'intègre.
 Pour cette raison, le JS cherche les éléments dans ce shadow root (root.getElementById, root.querySelector) et non dans document.
@@ -37,8 +37,14 @@ Opérateurs booléens pour articuler différentes lignes de recherche :
 
 Fieldset "Critères de recherche" (support et type de document, puis lignes de recherche) :
 > Support
-> Type de document
+> Type de document (liste dépendant du support : voir ci-dessous)
 > Lignes de recherche (champ, correspondance, expression)
+
+Types de documents selon le support :
+> Physique (une bibliothèque)            ⇒ types_de_documents_bibliotheque_cible
+> Physique (toutes les bibliothèques)    ⇒ types_de_documents_toutes_bibliotheques
+> En ligne                               ⇒ types_de_documents_toutes_bibliotheques
+Si l'usager change de support et que le type choisi n'est plus proposé (ou n'est plus sélectionnable), le type repasse sur « Tous types » (all_items).
 
 Fieldset "Filtres optionnels (date et langue)" (replié par défaut sur petit écran) :
 > Date de publication
@@ -91,7 +97,11 @@ Points d’attention pour l’intégration
     // 4. Nom accessible du formulaire, annoncé par les lecteurs d'écran (à rendre unique dans la page qui intègre le formulaire)
     const label_formulaire = 'Recherche dans le catalogue';
     // 5. Types de documents à afficher dans le formulaire. Inutile d'indiquer "all_items"
-    const types_de_documents = ["books", "journals", "articles", "conference_proceedings", "dissertations", "videos", "audios", "images", "games"]
+    //    - types_de_documents_bibliotheque_cible : utilisée quand le support est "Physique" (bibliothèque cible)
+    //    - types_de_documents_toutes_bibliotheques : utilisée quand le support est "Physique (toutes les bibliothèques)" ou "En ligne"
+    const types_de_documents_bibliotheque_cible = ["books", "journals", "articles", "conference_proceedings", "dissertations",  "audios", "images", "maps", "scores", "games"]
+    const types_de_documents_toutes_bibliotheques = ["books", "journals", "articles", "conference_proceedings", "dissertations",  "audios", "images", "maps", "scores", "games"]
+
     
     // Paramètres communs
     // URL de base de Primo UniCA
@@ -547,6 +557,8 @@ Points d’attention pour l’intégration
                             <option value="dissertations">Thèses / mémoires</option>
                             <option value="videos">Vidéos</option>
                             <option value="audios">CD</option>
+                            <option value="maps">Cartes</option>
+                            <option value="scores">Partitions</option>
                             <option value="images">Affiches</option>
                             <option value="games">Jeux</option>
                         </select>
@@ -909,53 +921,49 @@ Points d’attention pour l’intégration
         renderSearchRows();
     }
 
-    // masque certains types de documents en fonction de la variable de configuration types_de_documents
-    function updateDocumentTypes() {
-        const documentTypeOptions = documentTypeSelect.querySelectorAll('option');
-        documentTypeOptions.forEach(option => {
-            if ((option.value !== "all_items") & (!types_de_documents.includes(option.value))) {
-                option.remove();
-            }
-        });
-    }
+    // Catalogue complet des types de documents, capturé une fois pour toutes depuis le HTML (ordre et libellés de base).
+    // Le <select> est reconstruit à chaque changement de support à partir de ce catalogue.
+    const OnlineSuffix = ' (en ligne uniquement)';
+    const documentTypeCatalog = Array.from(documentTypeSelect.options).map(option => ({
+        value: option.value,
+        label: option.textContent.replace(OnlineSuffix, '')
+    }));
+    // Types ne concernant que les documents physiques / que les ressources en ligne
+    const onlyPhysicalTypes = ['videos', 'audios', 'images', 'scores', 'maps', 'games'];
+    const onlyOnlineTypes = ['articles', 'conference_proceedings'];
 
-    // Cette fonction adapte la liste des types de document au support choisi.
-    // Si l'on recherche uniquement des contenus en ligne les types purement physiques (vidéos, CD, affiches) sont non sélectionnables.
-    // À l'inverse, le type "articles" n'est sélectionnable que si on cherche des contenus en ligne.
+    // Reconstruit la liste des types de document en fonction du support choisi :
+    // - support "library" => types_de_documents_bibliotheque_cible
+    // - support "all_libraries" ou "online" => types_de_documents_toutes_bibliotheques
+    // Parmi les types retenus, ceux qui sont incompatibles avec le support restent affichés mais désactivés
+    // (vidéos, CD, affiches, jeux en ligne ; articles et actes en physique).
+    // Si le type précédemment choisi n'est plus disponible (absent de la liste ou désactivé), on revient à "all_items".
+    // Retourne true si le type a dû être remis sur "all_items".
     function updatedocumentTypes() {
         const support = supportSelect.value;
         const isPhysical = support === 'library' || support === 'all_libraries';
-        const options = {
-            videos: documentTypeSelect.querySelector('option[value="videos"]'),
-            audios: documentTypeSelect.querySelector('option[value="audios"]'),
-            images: documentTypeSelect.querySelector('option[value="images"]'),
-            games: documentTypeSelect.querySelector('option[value="games"]'),
-            articles: documentTypeSelect.querySelector('option[value="articles"]'),
-            conference_proceedings : documentTypeSelect.querySelector('option[value="conference_proceedings"]')
-        };
+        const allowedTypes = support === 'library'
+            ? types_de_documents_bibliotheque_cible
+            : types_de_documents_toutes_bibliotheques;
+        const previousType = documentTypeSelect.value;
 
-        if (options.videos !== null) { options.videos.disabled = !isPhysical; }
-        if (options.audios !== null) { options.audios.disabled = !isPhysical; }
-        if (options.images !== null) { options.images.disabled = !isPhysical; }
-        if (options.games !== null) { options.games.disabled = !isPhysical; }
-        if (options.articles !== null) {
-            options.articles.disabled = isPhysical;
-            options.articles.textContent = isPhysical ? 'Articles (en ligne uniquement)' : 'Articles';
-        }
-        if (options.conference_proceedings !== null) {
-            options.conference_proceedings.disabled = isPhysical;
-            options.conference_proceedings.textContent = isPhysical ? 'Actes de conférence (en ligne uniquement)' : 'Actes de conférence';
-         }
-        if (support === 'all_libraries') {
-            documentTypeSelect.value = 'all_items';
-            return;
-        }
+        documentTypeSelect.innerHTML = '';
+        documentTypeCatalog.forEach(({ value, label }) => {
+            if (value !== 'all_items' && !allowedTypes.includes(value)) return;
+            const option = document.createElement('option');
+            option.value = value;
+            const isOnlineOnly = onlyOnlineTypes.includes(value);
+            option.textContent = (isOnlineOnly && isPhysical) ? label + OnlineSuffix : label;
+            option.disabled = (onlyPhysicalTypes.includes(value) && !isPhysical)
+                || (isOnlineOnly && isPhysical);
+            documentTypeSelect.appendChild(option);
+        });
 
-        // Si l'utilisateur avait sélectionné une option désormais interdite on revient à "Tous types" pour éviter de de conserver un état incohérent dans le formulaire.
-        const selected = documentTypeSelect.querySelector(`option[value="${documentTypeSelect.value}"]`);
-        if (selected && selected.disabled) {
-            documentTypeSelect.value = 'all_items';
-        }
+        // Si le type précédent n'existe plus ou est désactivé, on revient à "Tous types" pour éviter un état incohérent.
+        const previousOption = documentTypeSelect.querySelector(`option[value="${previousType}"]`);
+        const stillValid = previousOption !== null && !previousOption.disabled;
+        documentTypeSelect.value = stillValid ? previousType : 'all_items';
+        return previousType !== 'all_items' && !stillValid;
     }
 
     // Retire l'option "Physique" si aucune bibliothèque n'est définie dans le code ; sinon met à jour le libellé de l'option "Physique" en y insérant le nom de la bibliothèque
@@ -1192,12 +1200,11 @@ Points d’attention pour l’intégration
 
     // Initialisation au chargement de la page.
     // 1) on crée les deux premières lignes
-    // 2) on applique la logique de compatibilité des types de documents
+    // 2) on construit la liste des types de documents selon le support
     // 3) on met à jour le libellé de l'option "Physique" si une bibliothèque est définie dans le code, on masque l'option "Physique" si aucune bibliothèque n'est définie dans le code
     // 4) on met à jour les champs années personnalisées
     // 5) on écoute les évenements entrainant une modification des champs années personnalisés
     initializeForm();
-    updateDocumentTypes();
     updatedocumentTypes();
     updateLibrarySupport();
     updatePublicationDateFieldVisibility();
