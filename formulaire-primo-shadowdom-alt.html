@@ -10,6 +10,9 @@ Code personnalisable en modifiant ces variables au début de la balise <script>:
   const label_bibliotheque = ''; => indiquer un nom de bibliothèque (peut être différent du nom défini dans Primo)
   const toutes_bibliotheques = true; => si true, donne la possibilité de chercher dans toutes les bibliothèques du réseau
 
+Accessibilité : un lien d'évitement (« Passer le formulaire de recherche dans le catalogue »), visible au focus clavier, permet de sauter le formulaire.
+Il s'appuie sur un repère vide (id = id du conteneur + "-fin") inséré par le script juste après #primo-form-host.
+
 Génération dynamique de 2 à 7 lignes de recherche.
 
 Champs disponibles :
@@ -170,7 +173,7 @@ Points d’attention pour l’intégration
         #primo-standalone-form .primo-search-criteria legend,
         #primo-standalone-form .primo-search-filters legend {
             font-size: 1rem;
-            font-weight: normal;
+            font-weight: 600;
             margin-bottom: 1rem;
             color: var(--couleur-legende);
         }
@@ -362,6 +365,34 @@ Points d’attention pour l’intégration
             height: 1rem;
         }
 
+        /* Lien d'évitement : invisible tant qu'il n'a pas le focus clavier */
+        #primo-standalone-form .primo-skip-link {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+        }
+
+        #primo-standalone-form .primo-skip-link:focus {
+            position: static;
+            display: inline-block;
+            width: auto;
+            height: auto;
+            margin: 0 0 1rem;
+            padding: 0.5rem 0.75rem;
+            overflow: visible;
+            clip: auto;
+            white-space: normal;
+            font-size: 0.9rem;
+            color: var(--couleur-focus);
+            background: #fff;
+            outline: 2px solid var(--couleur-focus);
+            outline-offset: 2px;
+        }
+
         /* Masquage visuel pour les éléments utiles aux technologies d'assistance uniquement */
         #primo-standalone-form .sr-only {
             position: absolute;
@@ -386,6 +417,11 @@ Points d’attention pour l’intégration
             }
             #primo-standalone-form .primo-search-actions {
                 flex-wrap: wrap;
+            }
+
+            #primo-standalone-form .primo-skip-link:focus {
+                padding: 0.75rem;
+                font-size: 1rem;
             }
 
             /* Marges latérales identiques pour tous les blocs et pour les boutons */
@@ -478,6 +514,7 @@ Points d’attention pour l’intégration
     </style>
 
     <form id="primo-standalone-form" role="search" lang="fr">
+        <a href="#" class="primo-skip-link" id="skipLink">Passer le formulaire de recherche dans le catalogue</a>
         <div class="primo-form">
             <p id="primoFormPerimeterHelp" class="sr-only">
                 Précisez d'abord le périmètre de la recherche : support (physique ou en ligne) et type de document.
@@ -628,6 +665,21 @@ Points d’attention pour l’intégration
     const $ = (id) => root.getElementById(id);
     const form = $('primo-standalone-form');
     form.setAttribute('aria-label', label_formulaire);
+
+    // Lien d'évitement : permet à l'usager qui navigue au clavier de sauter tout le formulaire.
+    // Un lien #ancre ne peut pas cibler un élément situé hors du shadow root : on insère donc
+    // un repère vide juste après le conteneur, dans la page hôte, et on lui donne le focus au clic.
+    // La tabulation reprend alors sur le contenu qui suit le formulaire.
+    const skipLink = $('skipLink');
+    const endMarker = document.createElement('div');
+    endMarker.id = (host.id || 'primo-form-host') + '-fin';
+    endMarker.tabIndex = -1;
+    endMarker.style.cssText = 'display:block;height:0;overflow:hidden;outline:none;';
+    host.insertAdjacentElement('afterend', endMarker);
+    skipLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        endMarker.focus();
+    });
     const supportSelect = $('support');
     const documentTypeSelect = $('documentType');
     const languageSelect = $('language');
