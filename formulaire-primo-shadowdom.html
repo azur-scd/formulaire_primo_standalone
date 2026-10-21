@@ -57,7 +57,10 @@ Points d’attention pour l’intégration
 > Les polices de la page hôte sont héritées (font-family: inherit), mais ses autres styles (couleurs, box-sizing, etc.) ne s’appliquent pas au formulaire. Si le rendu est un peu différent, ajoute les règles qui manquent dans le bloc <style> du template.
 > Pour intégrer plusieurs formulaires sur la même page, il faudra changer l’id primo-form-host pour chacun.
 > Penser à tester le comportement du window.open dans le CMS cible, certains bloquent les pop-ups tant que l’ouverture ne découle pas directement d’un clic, ce qui est bien le cas ici.
+> Pour tester la responsivité, intégrer l'ensemble du code dans une balise <body> précédée d'un <head><meta name="viewport" content="width=device-width, initial-scale=1"></head>, eux mêmes intégrés dans une balise <head>
+
 -->
+
 <div id="primo-form-host"></div>
 
 <script>
@@ -362,6 +365,10 @@ Points d’attention pour l’intégration
 
         /* Styles pour les conteneurs de petite taille */
         @container (max-width: 48em) {
+            /* Masque l'espace devant le premier champ de recherche */
+            #primo-standalone-form .primo-search-row .primo-input-group.spacer {
+                display: none;
+            }
             #primo-standalone-form .primo-search-row {
                 flex-wrap: wrap;
                 gap: 0.5rem;
@@ -1007,5 +1014,3 @@ Points d’attention pour l’intégration
     setupPublicationDateFilter();
 })();
 </script>
-
-
