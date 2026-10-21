@@ -1,6 +1,6 @@
 <!--
 Formulaire de recherche avancée déporté pour Primo BO adapté aux spécificités UniCA
-Version 1.4, 20/10/2026
+Version 1.5, 21/10/2026
 
 Ce formulaire utilise la technique du Shadow DOM : son HTML et son CSS sont isolés dans un "shadow root" rattaché à l'élément #primo-form-host, ce qui évite tout conflit de styles avec la page qui l'intègre.
 Pour cette raison, le JS cherche les éléments dans ce shadow root (root.getElementById, root.querySelector) et non dans document.
@@ -429,7 +429,7 @@ Points d’attention pour l’intégration
                         <select id="documentType" name="documentType">
                             <option value="all_items" selected>Tous types</option>
                             <option value="books">Livres</option>
-                            <option value="journals">Revues</option>                            
+                            <option value="journals">Revues</option>
                             <option value="articles">Articles (en ligne uniquement)</option>
                             <option value="conference_proceedings">Actes de conférence (en ligne uniquement)</option>
                             <option value="dissertations">Thèses / mémoires</option>
