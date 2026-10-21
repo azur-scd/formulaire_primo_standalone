@@ -1,6 +1,6 @@
 <!--
 Formulaire de recherche avancée déporté pour Primo BO adapté aux spécificités UniCA
-Version 1.6 (présentation alternative : Périmètre / Critères / Filtres empilés), 21/10/2026
+Version 1.7 (présentation alternative : Critères de recherche / Filtres empilés), 21/10/2026
 
 Ce formulaire utilise la technique du Shadow DOM : son HTML et son CSS sont isolés dans un "shadow root" rattaché à l'élément #primo-form-host, ce qui évite tout conflit de styles avec la page qui l'intègre.
 Pour cette raison, le JS cherche les éléments dans ce shadow root (root.getElementById, root.querySelector) et non dans document.
@@ -35,9 +35,10 @@ Opérateurs booléens pour articuler différentes lignes de recherche :
 > OU (OR)
 > SAUF (NOT)
 
-Fieldset "Périmètre" :
+Fieldset "Critères de recherche" (support et type de document, puis lignes de recherche) :
 > Support
 > Type de document
+> Lignes de recherche (champ, correspondance, expression)
 
 Fieldset "Filtres optionnels (date et langue)" (replié par défaut sur petit écran) :
 > Date de publication
@@ -168,7 +169,6 @@ Points d’attention pour l’intégration
         }
 
         /* Espacement entre les sections du formulaire */
-        #primo-standalone-form .primo-search-perimeter,
         #primo-standalone-form .primo-search-criteria,
         #primo-standalone-form .primo-search-filters {
             margin: 0 0 1.5rem;
@@ -177,7 +177,6 @@ Points d’attention pour l’intégration
         }
 
         /* Légendes des fieldsets */
-        #primo-standalone-form .primo-search-perimeter legend,
         #primo-standalone-form .primo-search-criteria legend,
         #primo-standalone-form .primo-search-filters legend {
             font-size: 1rem;
@@ -316,7 +315,7 @@ Points d’attention pour l’intégration
         }
 
         /* Formulaire */
-        /* Les trois fieldsets (Périmètre, Critères, Filtres) sont empilés sur toute la largeur */
+        /* Les deux fieldsets (Critères de recherche, Filtres) sont empilés sur toute la largeur */
         #primo-standalone-form .primo-form {
             display: flex;
             flex-direction: column;
@@ -328,7 +327,7 @@ Points d’attention pour l’intégration
             display: none;
         }
 
-        /* Grille de filtres à l'intérieur des fieldsets Périmètre et Filtres */
+        /* Grille de filtres à l'intérieur des fieldsets Critères de recherche (support, type de document) et Filtres */
         #primo-standalone-form .primo-filter-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
@@ -448,12 +447,10 @@ Points d’attention pour l’intégration
                 margin-inline: 0;
                 min-width: 0;
             }
-            #primo-standalone-form .primo-search-perimeter,
             #primo-standalone-form .primo-search-criteria,
             #primo-standalone-form .primo-search-filters {
                 margin-bottom: 2rem;
             }
-            #primo-standalone-form .primo-search-perimeter legend,
             #primo-standalone-form .primo-search-criteria legend,
             #primo-standalone-form .primo-search-filters legend {
                 padding: 0;
@@ -524,11 +521,12 @@ Points d’attention pour l’intégration
     <form id="primo-standalone-form" role="search" lang="fr">
         <a href="#" class="primo-skip-link" id="skipLink">Passer le formulaire de recherche dans le catalogue</a>
         <div class="primo-form">
-            <p id="primoFormPerimeterHelp" class="sr-only">
-                Précisez d'abord le périmètre de la recherche : support (physique ou en ligne) et type de document.
+            <p id="primoFormLeftSearchHelp" class="sr-only">
+                Précisez le support et le type de document, puis choisissez le critère de recherche, le type de correspondance, et l'expression à rechercher. Vous pouvez ajouter d'autres critères en les combinant à l'aide d'opérateurs ET, OU et SAUF.
             </p>
-            <fieldset class="primo-search-perimeter" aria-describedby="primoFormPerimeterHelp">
-                <legend>Périmètre</legend>
+            <div id="primoFormStatus" aria-live="polite" class="sr-only"></div>
+            <fieldset class="primo-search-criteria" aria-describedby="primoFormLeftSearchHelp">
+                <legend>Critères de recherche</legend>
                 <div class="primo-filter-grid">
                     <div class="primo-filter-group">
                         <label for="support">Support</label>
@@ -550,29 +548,21 @@ Points d’attention pour l’intégration
                             <option value="videos">Vidéos</option>
                             <option value="audios">CD</option>
                             <option value="images">Affiches</option>
-                            <option value="games">Jeux</option>                            
+                            <option value="games">Jeux</option>
                         </select>
                     </div>
                 </div>
+                <p id="primoFormError" class="primo-error" role="alert" hidden></p>
+                <div id="searchRows"></div>
+                <div class="primo-button-row">
+                    <button type="button" class="primo-btn-add" id="addRowBtn">
+                        <svg class="primo-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                        </svg>
+                        Ajouter une nouvelle ligne
+                    </button>
+                </div>
             </fieldset>
-
-                <p id="primoFormLeftSearchHelp" class="sr-only">
-                    Pour chaque critère de recherche choisissez le champ à interroger, le type de correspondance, et l'expression à rechercher. Vous pouvez combiner plusieurs critères à l'aide d'opérateurs booléens (ET, OU, SAUF).
-                </p>
-                <div id="primoFormStatus" aria-live="polite" class="sr-only"></div>
-                <fieldset class="primo-search-criteria" aria-describedby="primoFormLeftSearchHelp">
-                    <legend>Critères de recherche (titre, auteur, éditeur, sujet...)</legend>
-                    <p id="primoFormError" class="primo-error" role="alert" hidden></p>
-                    <div id="searchRows"></div>
-                    <div class="primo-button-row">
-                        <button type="button" class="primo-btn-add" id="addRowBtn">
-                            <svg class="primo-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
-                            </svg>
-                            Ajouter une nouvelle ligne
-                        </button>
-                    </div>
-                </fieldset>
 
             <p id="primoFormRightSearchHelp" class="sr-only">
                 Filtres optionnels pour préciser la date de publication et la langue.
