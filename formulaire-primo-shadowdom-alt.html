@@ -36,7 +36,7 @@ Fieldset "Périmètre" :
 > Support
 > Type de document
 
-Fieldset "Filtres" :
+Fieldset "Filtres optionnels (date et langue)" (replié par défaut sur petit écran) :
 > Date de publication
 > Langue
 
@@ -77,7 +77,7 @@ Points d’attention pour l’intégration
     // 3. Recherche possible sur toutes les biblithèques physiques du résseau
     const toutes_bibliotheques = true;
     // 4. Nom accessible du formulaire, annoncé par les lecteurs d'écran (à rendre unique dans la page qui intègre le formulaire)
-    const label_formulaire = 'Recherche dans le catalogue';
+    const label_formulaire = 'Recherche avancée dans le catalogue';
     // 5. Types de documents à afficher dans le formulaire. Inutile d'indiquer "all_items"
     const types_de_documents = ["journal", "articles", "conference_proceedings", "dissertations", "videos", "audios", "images", "games"]
     
@@ -312,6 +312,11 @@ Points d’attention pour l’intégration
             margin-top: 1.5rem;
         }
 
+        /* Bouton de repli des filtres : affiché uniquement sur petit conteneur */
+        #primo-standalone-form .primo-filters-toggle {
+            display: none;
+        }
+
         /* Grille de filtres à l'intérieur des fieldsets Périmètre et Filtres */
         #primo-standalone-form .primo-filter-grid {
             display: grid;
@@ -382,6 +387,93 @@ Points d’attention pour l’intégration
             #primo-standalone-form .primo-search-actions {
                 flex-wrap: wrap;
             }
+
+            /* Marges latérales identiques pour tous les blocs et pour les boutons */
+            #primo-standalone-form {
+                padding: 0 1rem;
+            }
+            #primo-standalone-form .primo-search-validation {
+                padding: 0;
+            }
+
+            /* Fieldsets sans cadre : les légendes deviennent des titres de section,
+               séparées par de l'espace plutôt que par des bordures */
+            #primo-standalone-form fieldset {
+                border: 0;
+                padding: 0;
+                margin-inline: 0;
+                min-width: 0;
+            }
+            #primo-standalone-form .primo-search-perimeter,
+            #primo-standalone-form .primo-search-criteria,
+            #primo-standalone-form .primo-search-filters {
+                margin-bottom: 2rem;
+            }
+            #primo-standalone-form .primo-search-perimeter legend,
+            #primo-standalone-form .primo-search-criteria legend,
+            #primo-standalone-form .primo-search-filters legend {
+                padding: 0;
+                font-size: 1.1rem;
+                font-weight: 600;
+                margin-bottom: 1rem;
+            }
+
+            /* Champs : police de 16 px (évite le zoom automatique d'iOS),
+               cible tactile d'au moins 44 px, zone de saisie encadrée */
+            #primo-standalone-form select,
+            #primo-standalone-form input[type="text"] {
+                box-sizing: border-box;
+                min-height: 2.75rem;
+                font-size: 1rem;
+                padding: 0.5rem 0.75rem;
+                border: 1px solid var(--couleur-bordure-bas);
+                border-radius: 0.25rem;
+                background: #fff;
+            }
+            #primo-standalone-form input[type="text"][aria-invalid="true"] {
+                border-color: var(--couleur-erreur);
+            }
+            #primo-standalone-form .primo-filter-group input[type="text"] {
+                margin-top: 0.5rem;
+            }
+
+            /* Filtres optionnels repliables : le bouton remplace la légende, qui est retirée
+               de l'affichage ET de l'arbre d'accessibilité (display: none) pour éviter
+               que les lecteurs d'écran n'annoncent le titre deux fois.
+               Le rôle "group" du fieldset est retiré en parallèle par le JS (voir applyFiltersSemantics). */
+            #primo-standalone-form .primo-search-filters legend {
+                display: none;
+            }
+            #primo-standalone-form .primo-filters-toggle {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                min-height: 2.75rem;
+                padding: 0.5rem 0;
+                margin-bottom: 0.5rem;
+                border: 0;
+                border-bottom: 1px solid var(--couleur-divider);
+                border-radius: 0;
+                background: transparent;
+                color: var(--couleur-legende);
+                font-size: 1.1rem;
+                font-weight: 600;
+                text-align: left;
+            }
+            #primo-standalone-form .primo-filters-toggle:hover {
+                background-color: var(--couleur-survol-bouton);
+            }
+            #primo-standalone-form .primo-filters-chevron {
+                flex: 0 0 auto;
+                transition: transform 0.2s;
+            }
+            #primo-standalone-form .primo-search-filters[data-expanded="true"] .primo-filters-chevron {
+                transform: rotate(180deg);
+            }
+            #primo-standalone-form .primo-search-filters[data-expanded="false"] .primo-filter-grid {
+                display: none;
+            }
         }
     </style>
 
@@ -440,9 +532,15 @@ Points d’attention pour l’intégration
             <p id="primoFormRightSearchHelp" class="sr-only">
                 Filtres optionnels pour préciser la date de publication et la langue.
             </p>
-            <fieldset class="primo-search-filters" aria-describedby="primoFormRightSearchHelp">
-                <legend>Filtres optionnels</legend>
-                <div class="primo-filter-grid">
+            <fieldset class="primo-search-filters" aria-describedby="primoFormRightSearchHelp" data-expanded="false">
+                <legend>Filtres optionnels (date et langue)</legend>
+                <button type="button" class="primo-filters-toggle" id="filtersToggle" aria-expanded="false" aria-controls="primoFiltersContent">
+                    <span>Filtres optionnels (date et langue)</span>
+                    <svg class="primo-icon primo-filters-chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/>
+                    </svg>
+                </button>
+                <div class="primo-filter-grid" id="primoFiltersContent">
                     <div class="primo-filter-group">
                         <label for="publicationDate">Date de publication</label>
                         <select id="publicationDate" name="publicationDate">
@@ -543,6 +641,8 @@ Points d’attention pour l’intégration
     const errorZone = $('primoFormError');
     const addBtn = $('addRowBtn');
     const clearBtn = $('clearBtn');
+    const filtersFieldset = root.querySelector('.primo-search-filters');
+    const filtersToggle = $('filtersToggle');
 
     // Tableau d'état principal du formulaire pour la partie "lignes de recherche".
     // Chaque objet du tableau représente une ligne visible à l'écran.
@@ -633,6 +733,42 @@ Points d’attention pour l’intégration
         });
     }
 
+    // Repli / dépli du fieldset "Filtres optionnels".
+    // Le repli n'existe que sur petit conteneur : le bouton et la règle CSS de masquage
+    // sont dans le @container, donc sur grand écran les filtres restent toujours visibles.
+    function setFiltersExpanded(expanded) {
+        filtersFieldset.dataset.expanded = String(expanded);
+        filtersToggle.setAttribute('aria-expanded', String(expanded));
+    }
+    filtersToggle.addEventListener('click', () => {
+        setFiltersExpanded(filtersFieldset.dataset.expanded !== 'true');
+    });
+
+    // Sémantique selon le mode d'affichage, pour que le titre ne soit annoncé qu'une fois :
+    // - grand écran : le fieldset reste un groupe nommé par sa légende ;
+    // - petit écran : le bouton de repli porte le titre. Le fieldset perd son rôle de groupe
+    //   (role="none") et le texte d'aide est rattaché au bouton.
+    // Le seuil reproduit celui du @container CSS (48em, em du conteneur).
+    function applyFiltersSemantics(isCompact) {
+        if (isCompact) {
+            filtersFieldset.setAttribute('role', 'none');
+            filtersFieldset.removeAttribute('aria-describedby');
+            filtersToggle.setAttribute('aria-describedby', 'primoFormRightSearchHelp');
+        } else {
+            filtersFieldset.removeAttribute('role');
+            filtersFieldset.setAttribute('aria-describedby', 'primoFormRightSearchHelp');
+            filtersToggle.removeAttribute('aria-describedby');
+        }
+    }
+    if (typeof ResizeObserver !== 'undefined') {
+        const updateFiltersSemantics = () => {
+            const em = parseFloat(getComputedStyle(host).fontSize) || 16;
+            applyFiltersSemantics(host.clientWidth <= 48 * em);
+        };
+        new ResizeObserver(updateFiltersSemantics).observe(host);
+        updateFiltersSemantics();
+    }
+
     function showError(message, invalidIndexes) {
         clearError();
         const inputs = root.querySelectorAll('#searchRows input[type="text"]');
@@ -642,7 +778,12 @@ Points d’attention pour l’intégration
         });
         errorZone.textContent = message;
         errorZone.hidden = false;
-        inputs[invalidIndexes[0]].focus();
+        if (invalidIndexes.length) {
+            inputs[invalidIndexes[0]].focus();
+        } else {
+            // Erreur portant sur les filtres (années) : on les déplie pour montrer le champ concerné.
+            setFiltersExpanded(true);
+        }
     }
 
     // Fonction centrale de rendu des lignes de recherche.
@@ -834,6 +975,8 @@ Points d’attention pour l’intégration
         customYearField.hidden = true;
         updateLibrarySupport();
         updatedocumentTypes();
+        // Replie la section des filtres optionnels (sans effet visible sur grand écran, où elle reste ouverte)
+        setFiltersExpanded(false);
         announce('Formulaire et filtres réinitialisés');
     });
 
