@@ -96,7 +96,11 @@ Points d’attention pour l’intégration
     const toutes_bibliotheques = true;
     // 4. Nom accessible du formulaire, annoncé par les lecteurs d'écran (à rendre unique dans la page qui intègre le formulaire)
     const label_formulaire = 'Recherche dans le catalogue';
-    // 5. Types de documents à afficher dans le formulaire. Inutile d'indiquer "all_items"
+    // 5. identifiant du formulaire intégré à l'URL d'appel à Primo dans un paramètre "custom_form"
+    // Utile pour les statistiques
+    // A remplacer par un code plus spécifique, par exemple primo_standalone_ljad
+    const code_formulaire = 'primo_standalone'; 
+    // 6. Types de documents à afficher dans le formulaire. Inutile d'indiquer "all_items"
     //    - types_de_documents_bibliotheque_cible : utilisée quand le support est "Physique" (bibliothèque cible)
     //    - types_de_documents_toutes_bibliotheques : utilisée quand le support est "Physique (toutes les bibliothèques)" ou "En ligne"
     const types_de_documents_bibliotheque_cible = ["books", "journals", "articles", "conference_proceedings", "dissertations",  "audios", "images", "maps", "scores", "games"]
@@ -1179,7 +1183,8 @@ Points d’attention pour l’intégration
         Object.entries(defaultParams).forEach(([key, value]) => {
             url.searchParams.append(key, value);
         });
-
+        url.searchParams.set('came_from', window.location.href);
+        url.searchParams.set('custom_form', code_formulaire);
         window.open(url.toString(), '_blank');
     });
 
