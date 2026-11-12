@@ -89,9 +89,9 @@ Points d’attention pour l’intégration
 (function () {
     // variables à modifier pour personnaliser le formulaire
     // 1. Code de bibliothèque pour activer un filtre sur une bibliothèque donnée
-    const code_bibliotheque = '';
+    const code_bibliotheque = 'VA';
     // 2. Nom de bibliothèque correspondant au code (peut être différent du nom utilisé par Primo)
-    const label_bibliotheque = '';
+    const label_bibliotheque = 'Bibliothèque Villa Arson';
     // 3. Recherche possible sur toutes les biblithèques physiques du résseau
     const toutes_bibliotheques = true;
     // 4. Nom accessible du formulaire, annoncé par les lecteurs d'écran (à rendre unique dans la page qui intègre le formulaire)
@@ -99,12 +99,12 @@ Points d’attention pour l’intégration
     // 5. identifiant du formulaire intégré à l'URL d'appel à Primo dans un paramètre "custom_form"
     // Utile pour les statistiques
     // A remplacer par un code plus spécifique, par exemple primo_standalone_ljad
-    const code_formulaire = 'primo_standalone'; 
+    const code_formulaire = 'primo_standalone_va'; 
     // 6. Types de documents à afficher dans le formulaire. Inutile d'indiquer "all_items"
     //    - types_de_documents_bibliotheque_cible : utilisée quand le support est "Physique" (bibliothèque cible)
     //    - types_de_documents_toutes_bibliotheques : utilisée quand le support est "Physique (toutes les bibliothèques)" ou "En ligne"
-    const types_de_documents_bibliotheque_cible = ["books", "journals", "articles", "conference_proceedings", "dissertations",  "audios", "images", "maps", "scores", "games"]
-    const types_de_documents_toutes_bibliotheques = ["books", "journals", "articles", "conference_proceedings", "dissertations",  "audios", "images", "maps", "scores", "games"]
+    const types_de_documents_bibliotheque_cible = ["books", "journals", "articles", "conference_proceedings", "videos"]
+    const types_de_documents_toutes_bibliotheques = ["books", "journals", "articles", "conference_proceedings", "videos", "dissertations",  "audios", "images", "maps", "scores", "games"]
 
     
     // Paramètres communs
